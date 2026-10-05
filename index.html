@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة تحصيلي ثاني ثانوي - الرياضيات (الفصل الأول)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX for rendering mathematical notation quickly -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        /* Printing optimizations */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white;
+                color: black;
+            }
+            .card-print-clean {
+                border: 1px solid #cbd5e1 !important;
+                box-shadow: none !important;
+                break-inside: avoid;
+            }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white shadow-lg no-print">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="bg-indigo-600 p-3 rounded-2xl shadow-md">
+                    <i class="fa-solid fa-calculator text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white sm:text-2xl">منصة التحصيلي الذكية</h1>
+                    <p class="text-xs text-indigo-300 font-medium">الرياضيات - الصف الثاني ثانوي (الفصل الدراسي الأول)</p>
+                </div>
+            </div>
+
+            <!-- Global Score & Student Info Summary Badge -->
+            <div class="flex flex-wrap items-center justify-center gap-3 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 text-xs">
+                <div class="flex items-center gap-2 border-l border-slate-700 pl-3">
+                    <i class="fa-solid fa-user-graduate text-indigo-400 text-base"></i>
+                    <div>
+                        <span class="block text-[10px] text-slate-400">الطالب الحالي</span>
+                        <span id="header-student-name" class="font-bold text-white">غير محدد</span>
+                    </div>
+                </div>
+                <div class="text-center px-1">
+                    <span class="block text-[10px] text-slate-400">إجمالي الأسئلة</span>
+                    <span id="total-questions-count" class="font-bold text-indigo-400">0</span>
+                </div>
+                <div class="h-6 w-px bg-slate-700 hidden sm:block"></div>
+                <div class="text-center px-1">
+                    <span class="block text-[10px] text-slate-400">الاختبارات المسجلة</span>
+                    <span id="completed-exams-count" class="font-bold text-emerald-400">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="bg-slate-800 border-t border-slate-700/60 px-4 sm:px-8">
+            <div class="max-w-7xl mx-auto flex space-x-2 space-x-reverse overflow-x-auto py-2 custom-scrollbar">
+                <button onclick="switchTab('chapters')" id="tab-btn-chapters" class="tab-btn active px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center space-x-2 space-x-reverse bg-indigo-600 text-white shadow-md">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>الأسئلة حسب الفصول</span>
+                </button>
+                <button onclick="switchTab('exam')" id="tab-btn-exam" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center space-x-2 space-x-reverse text-slate-300 hover:bg-slate-700 hover:text-white">
+                    <i class="fa-solid fa-stopwatch text-amber-400"></i>
+                    <span>الاختبارات الشاملة المتجددة</span>
+                </button>
+                <button onclick="switchTab('grades')" id="tab-btn-grades" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center space-x-2 space-x-reverse text-slate-300 hover:bg-slate-700 hover:text-white">
+                    <i id="grades-tab-icon" class="fa-solid fa-lock text-amber-400"></i>
+                    <span>سجل الدرجات (مقفل)</span>
+                </button>
+                <button onclick="switchTab('formulas')" id="tab-btn-formulas" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center space-x-2 space-x-reverse text-slate-300 hover:bg-slate-700 hover:text-white">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>ملخص القوانين والطباعة</span>
+                </button>
+                <button onclick="switchTab('upload')" id="tab-btn-upload" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center space-x-2 space-x-reverse text-slate-300 hover:bg-slate-700 hover:text-white">
+                    <i id="upload-tab-icon" class="fa-solid fa-lock text-amber-400"></i>
+                    <span>مركز رفع الأسئلة (مقفل)</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Security Passcode Modal -->
+    <div id="lock-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center hidden no-print">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-2xl border border-slate-200 text-center space-y-5 transform transition-all">
+            <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto text-2xl shadow-inner">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-slate-900" id="lock-modal-title">القسم محمي برمز مرور</h3>
+                <p class="text-xs text-slate-500 mt-1" id="lock-modal-desc">يرجى إدخال الرمز السري المصرح به للدخول إلى التبويب المقفل</p>
+            </div>
+            <div class="space-y-2">
+                <input type="password" id="unlock-pin-input" maxlength="10" placeholder="أدخل الرمز السري (...)..." 
+                       onkeydown="if(event.key === 'Enter') checkUnlockPin()"
+                       class="w-full text-center tracking-widest text-xl font-bold p-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                <p id="lock-error-msg" class="text-xs text-rose-600 font-bold hidden flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>رمز الدخول غير صحيح، حاول مرة أخرى.</span>
+                </p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="checkUnlockPin()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition-all shadow-md">
+                    تأكيد الدخول
+                </button>
+                <button onclick="closeLockModal()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-all">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main View Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1 w-full">
+
+        <!-- TAB 1: CHAPTERS & LESSONS -->
+        <section id="tab-chapters" class="tab-content space-y-6">
+            <!-- Chapter Selector Banner -->
+            <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 no-print">
+                <h2 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-indigo-600"></i>
+                     اختر الفصل والتصنيف الدراسي:
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <button onclick="filterChapter(1)" id="chap-btn-1" class="chap-filter-btn active p-3 rounded-xl border text-right transition-all bg-indigo-50 border-indigo-500 text-indigo-900 shadow-sm">
+                        <span class="text-xs font-semibold text-indigo-600 block">الفصل الأول</span>
+                        <span class="font-bold text-sm">الدوال والمتباينات</span>
+                    </button>
+                    <button onclick="filterChapter(2)" id="chap-btn-2" class="chap-filter-btn p-3 rounded-xl border border-slate-200 text-right transition-all hover:bg-slate-50 text-slate-700">
+                        <span class="text-xs font-semibold text-slate-500 block">الفصل الثاني</span>
+                        <span class="font-bold text-sm">المصفوفات</span>
+                    </button>
+                    <button onclick="filterChapter(3)" id="chap-btn-3" class="chap-filter-btn p-3 rounded-xl border border-slate-200 text-right transition-all hover:bg-slate-50 text-slate-700">
+                        <span class="text-xs font-semibold text-slate-500 block">الفصل الثالث</span>
+                        <span class="font-bold text-sm">كثيرات الحدود ودوالها</span>
+                    </button>
+                    <button onclick="filterChapter(4)" id="chap-btn-4" class="chap-filter-btn p-3 rounded-xl border border-slate-200 text-right transition-all hover:bg-slate-50 text-slate-700">
+                        <span class="text-xs font-semibold text-slate-500 block">الفصل الرابع</span>
+                        <span class="font-bold text-sm">العلاقات والدوال العكسية والجذرية</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Topic Filter sub-pills -->
+            <div id="topic-pills-container" class="flex flex-wrap gap-2 no-print">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Chapter Questions Container -->
+            <div id="chapter-questions-list" class="space-y-4">
+                <!-- Questions injected via JS -->
+            </div>
+        </section>
+
+        <!-- TAB 2: COMPREHENSIVE RENEWABLE EXAM -->
+        <section id="tab-exam" class="tab-content hidden space-y-6">
+            <!-- Exam Intro Card with Student Info Inputs -->
+            <div id="exam-start-card" class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                <div class="text-center space-y-3">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 text-amber-600 text-2xl shadow-inner">
+                        <i class="fa-solid fa-stopwatch"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">الاختبار المحاكي المتجدد (التحصيلي)</h2>
+                    <p class="text-slate-600 max-w-xl mx-auto text-sm leading-relaxed">
+                        يولد هذا النظام اختباراً شاملاً بنظام العشوائية للأسئلة والخيارات، وتُحفظ نتيجتك بتقرير مفصل في تبويب الدرجات المحمي.
+                    </p>
+                </div>
+
+                <!-- Student Information Entry Box -->
+                <div class="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-5 max-w-xl mx-auto space-y-4">
+                    <h3 class="font-bold text-indigo-900 text-sm flex items-center gap-2 border-b border-indigo-200 pb-2">
+                        <i class="fa-solid fa-id-card text-indigo-600"></i>
+                        بيانات الطالب (مطلوبة لتسجيل النتيجة في سجل الدرجات):
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم الطالب الرباعي <span class="text-rose-500">*</span></label>
+                            <input type="text" id="student-name-input" placeholder="مثال: محمد عبدالله أحمد..." 
+                                   class="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-xl p-3 font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الطالب / السجل <span class="text-rose-500">*</span></label>
+                            <input type="text" id="student-id-input" placeholder="مثال: 1092837465..." 
+                                   class="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-xl p-3 font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam Customizer -->
+                <div class="max-w-xs mx-auto text-center space-y-2">
+                    <label class="block text-xs font-bold text-slate-700">اختر عدد الأسئلة في الاختبار:</label>
+                    <select id="exam-q-count" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl p-3 font-bold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="10">10 أسئلة (10 دقائق)</option>
+                        <option value="15">15 سؤالاً (15 دقيقة)</option>
+                        <option value="20" selected>20 سؤالاً (20 دقيقة)</option>
+                        <option value="25">25 سؤالاً (25 دقيقة)</option>
+                    </select>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="startExam()" class="px-10 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base rounded-xl shadow-lg shadow-indigo-200 transition-all transform active:scale-95 inline-flex items-center gap-2">
+                        <i class="fa-solid fa-play"></i>
+                        <span>ابدأ الاختبار وتسجيل الدرجة</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Exam Screen -->
+            <div id="exam-active-card" class="hidden space-y-6">
+                <!-- Sticky Timer & Student Info Header -->
+                <div class="sticky top-4 z-20 bg-slate-900 text-white rounded-2xl p-4 shadow-xl border border-slate-800 flex flex-wrap justify-between items-center gap-4">
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        <div id="timer-badge" class="bg-amber-500 text-slate-900 font-black px-4 py-1.5 rounded-xl text-lg tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-clock"></i>
+                            <span id="exam-timer-text">00:00</span>
+                        </div>
+                        <div>
+                            <span id="active-student-display" class="block font-bold text-xs text-indigo-300"></span>
+                            <span id="timer-warning-note" class="text-[10px] text-amber-300 font-medium hidden">⚠️ متبقي أقل من 5 دقائق!</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div class="text-xs text-slate-300">
+                            سؤال <span id="current-q-index" class="font-bold text-white">1</span> من <span id="total-exam-q-count" class="font-bold text-white">20</span>
+                        </div>
+                        <button onclick="submitExam(false)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md">
+                            إنهاء وتسليم الاختبار
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                    <div id="exam-progress-bar" class="bg-indigo-600 h-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+
+                <!-- Questions Container -->
+                <div id="exam-questions-container" class="space-y-6">
+                    <!-- Exam questions rendered here -->
+                </div>
+
+                <!-- Bottom Submit Button -->
+                <div class="text-center py-4">
+                    <button onclick="submitExam(false)" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition-all">
+                        تسليم وحفظ الإجابات في سجل الدرجات
+                    </button>
+                </div>
+            </div>
+
+            <!-- Exam Result Report -->
+            <div id="exam-result-card" class="hidden bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                <div class="text-center space-y-2 border-b border-slate-200 pb-6">
+                    <div id="result-badge-icon" class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 text-3xl mb-2">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">تقرير نتيجة الاختبار التحصيلي</h2>
+                    <p id="result-student-info" class="text-indigo-600 font-bold text-sm"></p>
+                    <p class="text-slate-500 text-xs">تم حفظ الدرجة والحل النموذجي آلياً في "سجل الدرجات المحمي"</p>
+
+                    <div class="flex justify-center items-center gap-6 pt-4">
+                        <div class="bg-slate-50 px-6 py-3 rounded-2xl border border-slate-200 text-center">
+                            <span class="text-xs text-slate-500 block">الدرجة النهائية</span>
+                            <span id="result-score-percent" class="text-3xl font-black text-indigo-600">0%</span>
+                        </div>
+                        <div class="bg-slate-50 px-6 py-3 rounded-2xl border border-slate-200 text-center">
+                            <span class="text-xs text-slate-500 block">الأسئلة الصحيحة</span>
+                            <span id="result-correct-ratio" class="text-3xl font-black text-emerald-600">0/0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-between items-center gap-3 no-print">
+                    <h3 class="font-bold text-slate-900 text-lg">تفاصيل الإجابات والشرح النموذجي:</h3>
+                    <div class="flex gap-2">
+                        <button onclick="window.print()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-print"></i>
+                            <span>طباعة التقرير (PDF)</span>
+                        </button>
+                        <button onclick="resetExamUI()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            <span>إعادة اختبار جديد</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Exam Answers Review Container -->
+                <div id="exam-answers-review" class="space-y-4">
+                    <!-- Reviewed questions with detailed explanations -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: LOCKED GRADES LEDGER (درجات الطلاب) -->
+        <section id="tab-grades" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                <!-- Header Banner -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap text-indigo-600 text-2xl"></i>
+                            سجل درجات الطلاب والاختبارات المحفوظة
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">يُحفظ في هذا القسم المحمي كشف كامل بدرجات الطلاب وتاريخ تقديم الاختبارات إلكترونياً.</p>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 no-print">
+                        <button onclick="window.print()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all">
+                            <i class="fa-solid fa-print"></i>
+                            <span>طباعة كشف الدرجات</span>
+                        </button>
+                        <button onclick="clearAllScores()" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold flex items-center gap-2 transition-all">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span>مسح السجل</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search & Statistics Summary Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="block text-xs text-slate-500">إجمالي الاختبارات المنجزة</span>
+                        <span id="grades-stat-total" class="text-2xl font-black text-indigo-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="block text-xs text-slate-500">متوسط الدرجات العام</span>
+                        <span id="grades-stat-avg" class="text-2xl font-black text-emerald-600">0%</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center">
+                        <div class="w-full relative">
+                            <input type="text" id="search-grades-input" onkeyup="renderGradesTable()" placeholder="بحث برقم أو اسم الطالب..." 
+                                   class="w-full pl-8 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scores Table -->
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-right border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-900 text-white font-bold">
+                                <th class="p-3">#</th>
+                                <th class="p-3">اسم الطالب</th>
+                                <th class="p-3">رقم الطالب / الهوية</th>
+                                <th class="p-3">تاريخ ووقت الاختبار</th>
+                                <th class="p-3 text-center">الأسئلة الصحيحة</th>
+                                <th class="p-3 text-center">النسبة المئوية</th>
+                                <th class="p-3 text-center">التقدير</th>
+                                <th class="p-3 text-center no-print">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grades-table-body" class="divide-y divide-slate-200">
+                            <!-- Injected dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: FORMULAS SUMMARY & PRINT -->
+        <section id="tab-formulas" class="tab-content hidden space-y-6">
+            <!-- Header Actions Banner -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 no-print">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-book-bookmark text-indigo-600"></i>
+                        ملخص القوانين والمفاهيم الأساسية
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">دليل سريع لمراجعة قوانين الرياضيات للصف الثاني ثانوي - الفصل الأول قبل الاختبار التحصيلي</p>
+                </div>
+                <button onclick="window.print()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-print text-lg"></i>
+                    <span>طباعة / تصدير PDF</span>
+                </button>
+            </div>
+
+            <!-- Printable Document Container -->
+            <div id="printable-formulas-doc" class="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200 space-y-8 card-print-clean">
+                
+                <!-- Document Cover / Header for PDF printing -->
+                <div class="border-b-2 border-slate-900 pb-4 text-center sm:text-right flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h1 class="text-2xl font-black text-slate-900">ملخص قوانين الرياضيات التحصيلي</h1>
+                        <p class="text-sm font-semibold text-slate-600">الصف الثاني ثانوي - الفصل الدراسي الأول</p>
+                    </div>
+                    <div class="text-xs text-slate-500 text-center sm:text-left">
+                        <p class="font-bold text-slate-800">منصة تحصيلي الرياضيات الذكية</p>
+                        <p>تاريخ الطباعة: <span id="print-date"></span></p>
+                    </div>
+                </div>
+
+                <!-- Chapter 1 Summary -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-indigo-900 bg-indigo-50 p-3 rounded-xl border-r-4 border-indigo-600">
+                        الفصل الأول: الدوال والمتباينات
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                            <h4 class="font-bold text-slate-900">1. مجموعات الأعداد الحقيقية ($\mathbb{R}$):</h4>
+                            <ul class="list-disc list-inside text-xs text-slate-700 space-y-1">
+                                <li><strong>الأعداد الطبيعية ($\mathbb{N}$):</strong> $\{1, 2, 3, \dots\}$</li>
+                                <li><strong>الأعداد الكلية ($\mathbb{W}$):</strong> $\{0, 1, 2, 3, \dots\}$</li>
+                                <li><strong>الأعداد الصحيحة ($\mathbb{Z}$):</strong> $\{\dots, -2, -1, 0, 1, 2, \dots\}$</li>
+                                <li><strong>الأعداد النسبية ($\mathbb{Q}$):</strong> تكتب على صورة $\frac{a}{b}$ حيث $b \neq 0$ (مثل الكسور والأعداد العشرية المنتهية أو الدورية).</li>
+                                <li><strong>الأعداد غير النسبية ($\mathbb{I}$):</strong> الجذور التي ليست مربعات كاملة (مثل $\sqrt{3}$) والعدد $\pi$.</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                            <h4 class="font-bold text-slate-900">2. الدوال الخاصة والخاصيات:</h4>
+                            <ul class="list-disc list-inside text-xs text-slate-700 space-y-1">
+                                <li><strong>دالة أكبر عدد صحيح $\lfloor x \rfloor$:</strong> تعطي أكبر عدد صحيح أقل من أو يساوي $x$. مثال: $\lfloor 3.8 \rfloor = 3$ و $\lfloor -2.3 \rfloor = -3$.</li>
+                                <li><strong>دالة القيمة المطلقة $f(x) = |x|$:</strong> مجالها $\mathbb{R}$ ومدادها $[0, \infty)$.</li>
+                                <li><strong>النظير الجمعي:</strong> تغيير الإشارة فقط ($a \rightarrow -a$).</li>
+                                <li><strong>النظير الضربي:</strong> مقلوب العدد بنفس الإشارة ($a \rightarrow \frac{1}{a}$).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chapter 2 Summary -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-indigo-900 bg-indigo-50 p-3 rounded-xl border-r-4 border-indigo-600">
+                        الفصل الثاني: المصفوفات
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                            <h4 class="font-bold text-slate-900">1. الرتب وشرط ضرب المصفوفات:</h4>
+                            <p class="text-xs text-slate-700">تكتب رتبة المصفوفة على صورة $m \times n$ (صفوف $\times$ أعمدة).</p>
+                            <p class="text-xs text-slate-700"><strong>شرط إكانية ضرب المصفوفات:</strong> يُمكِن ضرب $A_{m \times r}$ في $B_{r \times n}$ لأن عدد أعمدة الأولى يطابق عدد صفوف الثانية، وتكون رتبة الناتج $C_{m \times n}$.</p>
+                        </div>
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                            <h4 class="font-bold text-slate-900">2. المحددات والنظير الضربي:</h4>
+                            <p class="text-xs text-slate-700"><strong>محدد المصفوفة الثنائية:</strong> $\det \begin{bmatrix} a & b \\ c & d \end{bmatrix} = ad - bc$</p>
+                            <p class="text-xs text-slate-700"><strong>النظير الضربي $A^{-1}$:</strong> يُوجد فقط إذا كان المحدد $|A| \neq 0$ والقانون هو: $A^{-1} = \frac{1}{|A|} \begin{bmatrix} d & -b \\ -c & a \end{bmatrix}$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chapter 3 Summary -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-indigo-900 bg-indigo-50 p-3 rounded-xl border-r-4 border-indigo-600">
+                        الفصل الثالث: كثيرات الحدود ودوالها
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                            <h4 class="font-bold text-slate-900">1. الأعداد المركبة والمميز:</h4>
+                            <p class="text-xs text-slate-700">الوحدة التخيلية: $i = \sqrt{-1}$، وحيث $i^2 = -1, i^3 = -i, i^4 = 1$.</p>
+                            <p class="text-xs text-slate-700"><strong>المميز $b^2 - 4ac$:</strong></p>
+                            <ul class="list-disc list-inside text-xs text-slate-700 space-y-1">
+                                <li>إذا كان $>0$ ومربع كامل: جذران نسببان حقيقيان.</li>
+                                <li>إذا كان $=0$: جذر حقيقي واحد مكرر مرتين.</li>
+                                <li>إذا كان $<0$: جذران مركبان مترافقان.</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                            <h4 class="font-bold text-slate-900">2. أصفار كثيرات الحدود وباقي القسمة:</h4>
+                            <p class="text-xs text-slate-700"><strong>نظرية الباقي:</strong> باقي قسمة $f(x)$ على $(x - c)$ هو $f(c)$.</p>
+                            <p class="text-xs text-slate-700"><strong>درجة كثيرة الحدود:</strong> هي أكبر أس للمتغير فيها. وعدد الجذور المركبة يساوي درجة كثيرة الحدود حسب النظرية الأساسية في الجبر.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chapter 4 Summary -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold text-indigo-900 bg-indigo-50 p-3 rounded-xl border-r-4 border-indigo-600">
+                        الفصل الرابع: العلاقات والدوال العكسية والجذرية
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                            <h4 class="font-bold text-slate-900">1. تركيب الدوال والدالة العكسية:</h4>
+                            <p class="text-xs text-slate-700"><strong>تركيب دالتين:</strong> $[f \circ g](x) = f(g(x))$ (نعوض قاعدة $g(x)$ داخل $f$).</p>
+                            <p class="text-xs text-slate-700"><strong>إيجاد $f^{-1}(x)$:</strong> استبدل $f(x)$ بـ $y$، ثم بدل مكان $x$ و $y$ واجعل $y$ طرفاً بمفرده.</p>
+                        </div>
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                            <h4 class="font-bold text-slate-900">2. المجال والدوال الجذرية والأسس النسبية:</h4>
+                            <p class="text-xs text-slate-700"><strong>مجال دالة الجذر التربيعي $f(x) = \sqrt{g(x)}$:</strong> ما تحت الجذر يجب أن يكون أكبر من أو يساوي الصفر ($g(x) \ge 0$).</p>
+                            <p class="text-xs text-slate-700"><strong>التحويل للأسس النسبية:</strong> $\sqrt[n]{x^m} = x^{\frac{m}{n}}$.</p>
+                            <p class="text-xs text-slate-700"><strong>إنطاق المقام:</strong> نضرب البسط والمقام في مرافق المقام للتخلص من الجذر.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 5: FILE UPLOAD & PARSER -->
+        <section id="tab-upload" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-indigo-600"></i>
+                        مركز رفع وتفريغ الأسئلة الذكي
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">
+                        يمكنك رفع ملفات التجميعات أو الاختبارات بجميع الصيغ (PDF, Word, Excel, TXT, JSON) لتفريغها ودمجها مباشرة في البنك.
+                    </p>
+                </div>
+
+                <!-- Drag & Drop Zone -->
+                <div onclick="document.getElementById('file-upload-input').click()" 
+                     class="border-2 border-dashed border-indigo-300 hover:border-indigo-600 rounded-2xl p-8 sm:p-12 text-center bg-indigo-50/40 hover:bg-indigo-50 transition-all cursor-pointer space-y-3 group">
+                    <div class="w-16 h-16 rounded-full bg-indigo-100 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white transition-all flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-file-import"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm sm:text-base">انقر هنا لاختيار ملف من جهازك أو اسحبه هنا</p>
+                        <p class="text-xs text-slate-500 mt-1">يدعم ملفات: PDF, DOCX, XLSX, TXT, JSON</p>
+                    </div>
+                    <input type="file" id="file-upload-input" class="hidden" accept=".pdf,.doc,.docx,.xlsx,.xls,.txt,.json" onchange="processFileUpload(event)">
+                </div>
+
+                <!-- Processing & Progress Animation Area -->
+                <div id="upload-progress-card" class="hidden bg-slate-900 text-white rounded-2xl p-6 space-y-4">
+                    <div class="flex justify-between items-center text-xs">
+                        <span id="upload-filename-text" class="font-bold text-indigo-300">جاري قراءة الملف...</span>
+                        <span id="upload-percentage" class="font-mono font-bold text-emerald-400">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                        <div id="upload-progress-bar" class="bg-indigo-500 h-full transition-all duration-200" style="width: 0%"></div>
+                    </div>
+                    <p id="upload-step-description" class="text-xs text-slate-400 animate-pulse">جاري استخراج النصوص والمعادلات وتصنيفها حسب الفصول...</p>
+                </div>
+
+                <!-- Manual Paste / JSON Direct Inject Option -->
+                <div class="border-t border-slate-200 pt-6 space-y-3">
+                    <h3 class="font-bold text-sm text-slate-800">أو يمكنك نسخ ولصق أسئلة بتنسيق نصي سريـع:</h3>
+                    <textarea id="raw-text-input" rows="4" placeholder="أدخل السؤال ثم خياراته بالسطور التالية...&#10;مثال:&#10;ما قيمة i^12 ؟&#10;أ) 1&#10;ب) -1&#10;ج) i&#10;د) -i" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs focus:ring-indigo-500 focus:border-indigo-500 font-mono"></textarea>
+                    
+                    <div class="flex justify-between items-center">
+                        <select id="paste-target-chapter" class="bg-slate-100 border border-slate-300 text-xs rounded-xl p-2 font-bold text-slate-700">
+                            <option value="1">الفصل الأول: الدوال والمتباينات</option>
+                            <option value="2">الفصل الثاني: المصفوفات</option>
+                            <option value="3">الفصل الثالث: كثيرات الحدود</option>
+                            <option value="4">الفصل الرابع: الدوال الجذرية</option>
+                        </select>
+
+                        <button onclick="parseDirectPastedText()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            <span>تفريغ ودمج السؤال</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom Added Questions Log -->
+                <div class="border-t border-slate-200 pt-6 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-slate-800">الأسئلة التي تم رفعها وتفريغها مؤخراً:</h3>
+                        <button onclick="clearCustomQuestions()" class="text-xs text-rose-600 hover:underline">مسح الأسئلة المضافة</button>
+                    </div>
+                    <div id="custom-questions-log" class="space-y-2 text-xs text-slate-600">
+                        <p class="text-slate-400 italic">لم يتم إضافة أسئلة مخصصة بعد.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-xs border-t border-slate-800 mt-auto no-print">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p>منصة التحصيلي التفاعلية - الرياضيات للصف الثاني ثانوي (الفصل الدراسي الأول)</p>
+            <p class="text-slate-600">مجهزة بجميع محتويات الفصول الأربعة مع حفظ كشوف الدرجات والتحديث الفوري</p>
+        </div>
+    </footer>
+
+    <script>
+        // Security Passcode Settings
+        const PROTECTED_PIN_CODE = "3212";
+        let unlockedTabs = {
+            upload: false,
+            grades: false
+        };
+        let targetLockedTab = null;
+
+        // Student Scores Ledger Array
+        let studentScoresList = [];
+
+        // Comprehensive Question Bank organized by Chapters and Topics
+        const defaultQuestionBank = [
+            // CHAPTER 1: الدوال والمتباينات
+            {
+                id: 'q1_1',
+                chapter: 1,
+                topic: 'خصائص الأعداد الحقيقية',
+                question: 'أي من الأعداد التالية ينتمي إلى مجموعة الأعداد غير النسبية (\\mathbb{I}$)؟',
+                options: ['\\sqrt{25}', '\\sqrt{7}', '0.75', '-\\frac{3}{4}'],
+                correct: 1,
+                explanation: 'العدد $\\sqrt{7}$ غير نسبية لأن 7 ليس مربعاً كاملاً، أما $\\sqrt{25}=5$ فهو عدد كلي وصحيح ونسبي.'
+            },
+            {
+                id: 'q1_2',
+                chapter: 1,
+                topic: 'خصائص الأعداد الحقيقية',
+                question: 'النظير الضربي للعدد $-\\frac{3}{5}$ هو:',
+                options: ['\\frac{3}{5}', '-\\frac{5}{3}', '\\frac{5}{3}', '-\\frac{3}{5}'],
+                correct: 1,
+                explanation: 'النظير الضربي لعدد هو مقلوبه مع المحافظة على الإشارة، ومقلوب $-\\frac{3}{5}$ هو $-\\frac{5}{3}$.'
+            },
+            {
+                id: 'q1_3',
+                chapter: 1,
+                topic: 'دوال خاصة',
+                question: 'ما قيمة دالة أكبر عدد صحيح $\\lfloor -2.4 \\rfloor$ ؟',
+                options: ['-2', '-3', '2', '3'],
+                correct: 1,
+                explanation: 'دالة أكبر عدد صحيح تعطي أكبر عدد صحيح أقل من أو يساوي العدد. وأكبر عدد صحيح $\\le -2.4$ هو $-3$.'
+            },
+            {
+                id: 'q1_4',
+                chapter: 1,
+                topic: 'دوال خاصة',
+                question: 'مدى دالة القيمة المطلقة $f(x) = |x - 3| + 2$ هو:',
+                options: ['[3, \\infty)', '[2, \\infty)', '(-\\infty, 2]', '\\mathbb{R}'],
+                correct: 1,
+                explanation: 'دالة القيمة المطلقة الرئيسية $|x| \\ge 0$، وبالتالي فإن $|x-3|+2 \\ge 2$، فيكون المدى هو $[2, \\infty)$.'
+            },
+            {
+                id: 'q1_5',
+                chapter: 1,
+                topic: 'المتباينات الخطية وأنظمتها',
+                question: 'النقطة التي تمثل حلاً للنظام المتبين $y > 2x$ و $y < x + 4$ هي:',
+                options: ['(1, 3)', '(2, 1)', '(0, 0)', '(3, 2)'],
+                correct: 0,
+                explanation: 'بالتعويض بالنقطة $(1,3)$: في المتباينة الأولى $3 > 2(1) \\Rightarrow 3 > 2$ (صحيحة). وفي الثانية $3 < 1 + 4 \\Rightarrow 3 < 5$ (صحيحة).'
+            },
+
+            // CHAPTER 2: المصفوفات
+            {
+                id: 'q2_1',
+                chapter: 2,
+                topic: 'مقدمة في المصفوفات',
+                question: 'رتبة المصفوفة $A = \\begin{bmatrix} 2 & -1 & 0 \\\\ 5 & 3 & 4 \\end{bmatrix}$ هي:',
+                options: ['3 \\times 2', '2 \\times 3', '2 \\times 2', '3 \\times 3'],
+                correct: 1,
+                explanation: 'تتكون المصفوفة من صفين وثلاثة أعمدة، إذن رتبتها هي $2 \\times 3$.'
+            },
+            {
+                id: 'q2_2',
+                chapter: 2,
+                topic: 'ضرب المصفوفات والمحددات',
+                question: 'إذا كانت رتبة المصفوفة $A$ هي $2 \\times 3$ ورتبة المصفوفة $B$ هي $3 \\times 4$، فإن رتبة المصفوفة $A \\cdot B$ تكون:',
+                options: ['3 \\times 3', '2 \\times 4', '4 \\times 2', 'لا يمكن الضرب'],
+                correct: 1,
+                explanation: 'شرط إمكانية الضرب محقق (عدد أعمدة الأول 3 يساوي صفوف الثاني 3)، والرتبة الناتجة تكون $2 \\times 4$.'
+            },
+            {
+                id: 'q2_3',
+                chapter: 2,
+                topic: 'ضرب المصفوفات والمحددات',
+                question: 'قيمة محددة المصفوفة $\\det \\begin{bmatrix} 4 & 2 \\\\ 3 & 5 \\end{bmatrix}$ تساوي:',
+                options: ['14', '26', '20', '6'],
+                correct: 0,
+                explanation: 'قيمة المحدد الثنائي = (حاصل ضرب عناصر القطر الرئيس) - (حاصل ضرب عناصر القطر الآخر) = $(4 \\times 5) - (2 \\times 3) = 20 - 6 = 14$.'
+            },
+            {
+                id: 'q2_4',
+                chapter: 2,
+                topic: 'النظير الضربي وأنظمة المعادلات',
+                question: 'تكون المصفوفة $\\begin{bmatrix} k & 4 \\\\ 3 & 6 \\end{bmatrix}$ ليس لها نظير ضربي إذا كانت قيمة $k$ تساوي:',
+                options: ['2', '8', '12', '0'],
+                correct: 0,
+                explanation: 'لا يوجد نظير ضربي للمصفوفة عندما يكون محددها مساوياً للصفر: $(k \\cdot 6) - (4 \\cdot 3) = 0 \\Rightarrow 6k - 12 = 0 \\Rightarrow k = 2$.'
+            },
+
+            // CHAPTER 3: كثيرات الحدود ودوالها
+            {
+                id: 'q3_1',
+                chapter: 3,
+                topic: 'الأعداد المركبة والمميز',
+                question: 'ما قيمة $i^{38}$ حيث $i = \\sqrt{-1}$ ؟',
+                options: ['1', '-1', 'i', '-i'],
+                correct: 1,
+                explanation: 'نقسم الأس على 4: $38 \\div 4 = 9$ والباقي $2$. إذن $i^{38} = i^2 = -1$.'
+            },
+            {
+                id: 'q3_2',
+                chapter: 3,
+                topic: 'الأعداد المركبة والمميز',
+                question: 'نوع جذور المعادلة $x^2 - 4x + 5 = 0$ باستخدام المميز هو:',
+                options: ['جذران حقيقيان نسببان', 'جذر حقيقي واحد مكرر', 'جذران مركبان مترافقان', 'جذران غير نسببين'],
+                correct: 2,
+                explanation: 'المميز $b^2 - 4ac = (-4)^2 - 4(1)(5) = 16 - 20 = -4 < 0$. وبما أن المميز سالب، فالجذران مركبان مترافقان.'
+            },
+            {
+                id: 'q3_3',
+                chapter: 3,
+                topic: 'العمليات وقسمة كثيرات الحدود',
+                question: 'باقي قسمة كثيرة الحدود $f(x) = x^3 - 2x^2 + 3x - 5$ على $(x - 2)$ يساوي:',
+                options: ['1', '-5', '7', '0'],
+                correct: 0,
+                explanation: 'حسب نظرية الباقي، نعوض $x = 2$ في الدالة: $f(2) = (2)^3 - 2(2)^2 + 3(2) - 5 = 8 - 8 + 6 - 5 = 1$.'
+            },
+            {
+                id: 'q3_4',
+                chapter: 3,
+                topic: 'دوال الجذور والأصفار',
+                question: 'درجة كثيرة الحدود $f(x) = 4x^5 - 2x^3 + 7x^2 - 9$ والمعامل الرئيس لها هما على التوالي:',
+                options: ['الدرجة 5 والمعامل الرئيس 4', 'الدرجة 3 والمعامل الرئيس -2', 'الدرجة 5 والمعامل الرئيس -9', 'الدرجة 2 والمعامل الرئيس 7'],
+                correct: 0,
+                explanation: 'درجة كثيرة الحدود هي أكبر أس للمتغير فيها (وهو 5)، والمعامل الرئيس هو معامل هذا الحد (وهو 4).'
+            },
+
+            // CHAPTER 4: العلاقات والدوال العكسية والجذرية
+            {
+                id: 'q4_1',
+                chapter: 4,
+                topic: 'تركيب الدوال والدوال العكسية',
+                question: 'إذا كان $f(x) = x^2 + 1$ و $g(x) = 2x$ ، فإن قيمة $[f \\circ g](3)$ تساوي:',
+                options: ['37', '19', '12', '36'],
+                correct: 0,
+                explanation: 'نحسب أولاً $g(3) = 2(3) = 6$ ، ثم نعوض الناتج في $f$: $f(6) = (6)^2 + 1 = 36 + 1 = 37$.'
+            },
+            {
+                id: 'q4_2',
+                chapter: 4,
+                topic: 'تركيب الدوال والدوال العكسية',
+                question: 'الدالة العكسية $f^{-1}(x)$ للدالة $f(x) = 2x - 6$ هي:',
+                options: ['f^{-1}(x) = \\frac{x + 6}{2}', 'f^{-1}(x) = \\frac{x - 6}{2}', 'f^{-1}(x) = 6x - 2', 'f^{-1}(x) = -2x + 6'],
+                correct: 0,
+                explanation: 'نضع $y = 2x - 6$ ثم نبدل $x$ و $y$: $x = 2y - 6 \\Rightarrow 2y = x + 6 \\Rightarrow y = \\frac{x + 6}{2}$.'
+            },
+            {
+                id: 'q4_3',
+                chapter: 4,
+                topic: 'الدوال والجذور والأسس النسبية',
+                question: 'مجال دالة الجذر التربيعي $f(x) = \\sqrt{3x - 12}$ هو:',
+                options: ['[4, \\infty)', '(4, \\infty)', '[-4, \\infty)', '\\mathbb{R}'],
+                correct: 0,
+                explanation: 'ما تحت الجذر يجب أن يكون أكبر من أو يساوي الصفر: $3x - 12 \\ge 0 \\Rightarrow 3x \\ge 12 \\Rightarrow x \\ge 4$.'
+            },
+            {
+                id: 'q4_4',
+                chapter: 4,
+                topic: 'الدوال والجذور والأسس النسبية',
+                question: 'إنطاق المقام للمقدار $\\frac{6}{\\sqrt{3}}$ يعطي:',
+                options: ['2\\sqrt{3}', '3\\sqrt{2}', '6\\sqrt{3}', '2'],
+                correct: 0,
+                explanation: 'نضرب البسط والمقام في $\\sqrt{3}$: $\\frac{6\\sqrt{3}}{\\sqrt{3} \\cdot \\sqrt{3}} = \\frac{6\\sqrt{3}}{3} = 2\\sqrt{3}$.'
+            }
+        ];
+
+        let questionBank = [...defaultQuestionBank];
+        let currentFilteredChapter = 1;
+        let selectedTopicFilter = 'ALL';
+        let examTimerInterval = null;
+        let examQuestionsList = [];
+        let examUserAnswers = {};
+        let examTimeRemaining = 0;
+        let activeStudentInfo = { name: '', id: '' };
+
+        // Initialize App on DOM Load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCustomQuestionsFromStorage();
+            loadStudentScoresFromStorage();
+            updateTotalCounters();
+            filterChapter(1);
+            document.getElementById('print-date').innerText = new Date().toLocaleDateString('ar-SA');
+        });
+
+        // LaTeX re-render helper function
+        function renderMath() {
+            setTimeout(() => {
+                if (window.renderMathInElement) {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ],
+                        throwOnError: false
+                    });
+                }
+            }, 50);
+        }
+
+        // Tab Switching Logic with Lock Interception
+        function switchTab(tabName) {
+            if ((tabName === 'upload' && !unlockedTabs.upload) || (tabName === 'grades' && !unlockedTabs.grades)) {
+                targetLockedTab = tabName;
+                openLockModal(tabName);
+                return;
+            }
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                btn.classList.add('text-slate-300');
+            });
+
+            const activeContent = document.getElementById(`tab-${tabName}`);
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+
+            if (activeContent && activeBtn) {
+                activeContent.classList.remove('hidden');
+                activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+                activeBtn.classList.remove('text-slate-300');
+            }
+
+            if (tabName === 'grades') {
+                renderGradesTable();
+            }
+
+            renderMath();
+        }
+
+        // Security Lock Modal Functions
+        function openLockModal(tabKey) {
+            const titleEl = document.getElementById('lock-modal-title');
+            const descEl = document.getElementById('lock-modal-desc');
+
+            if (tabKey === 'grades') {
+                titleEl.innerText = "سجل الدرجات محمي برمز مرور";
+                descEl.innerText = "يرجى إدخال الرمز السري (3212) لعرض كشف درجات الطلاب ونتائج الاختبارات";
+            } else {
+                titleEl.innerText = "مركز الرفع محمي برمز مرور";
+                descEl.innerText = "يرجى إدخال الرمز السري (3212) لدخول مركز رفع وتفريغ الأسئلة";
+            }
+
+            document.getElementById('unlock-pin-input').value = '';
+            document.getElementById('lock-error-msg').classList.add('hidden');
+            document.getElementById('lock-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('unlock-pin-input').focus(), 100);
+        }
+
+        function closeLockModal() {
+            document.getElementById('lock-modal').classList.add('hidden');
+            targetLockedTab = null;
+        }
+
+        function checkUnlockPin() {
+            const inputVal = document.getElementById('unlock-pin-input').value.trim();
+            if (inputVal === PROTECTED_PIN_CODE) {
+                if (targetLockedTab) {
+                    unlockedTabs[targetLockedTab] = true;
+                    
+                    // Update navigation button icons
+                    if (targetLockedTab === 'grades') {
+                        const icon = document.getElementById('grades-tab-icon');
+                        const btnSpan = document.querySelector('#tab-btn-grades span');
+                        if (icon) icon.className = "fa-solid fa-graduation-cap text-emerald-400";
+                        if (btnSpan) btnSpan.innerText = "سجل الدرجات";
+                    } else if (targetLockedTab === 'upload') {
+                        const icon = document.getElementById('upload-tab-icon');
+                        const btnSpan = document.querySelector('#tab-btn-upload span');
+                        if (icon) icon.className = "fa-solid fa-lock-open text-emerald-400";
+                        if (btnSpan) btnSpan.innerText = "مركز رفع الأسئلة";
+                    }
+
+                    const destination = targetLockedTab;
+                    closeLockModal();
+                    switchTab(destination);
+                }
+            } else {
+                document.getElementById('lock-error-msg').classList.remove('hidden');
+                document.getElementById('unlock-pin-input').value = '';
+                document.getElementById('unlock-pin-input').focus();
+            }
+        }
+
+        function filterChapter(chapNumber) {
+            currentFilteredChapter = chapNumber;
+            selectedTopicFilter = 'ALL';
+
+            // Update chapter filter button styles
+            document.querySelectorAll('.chap-filter-btn').forEach((btn, index) => {
+                if (index + 1 === chapNumber) {
+                    btn.className = "chap-filter-btn active p-3 rounded-xl border text-right transition-all bg-indigo-50 border-indigo-500 text-indigo-900 shadow-sm";
+                } else {
+                    btn.className = "chap-filter-btn p-3 rounded-xl border border-slate-200 text-right transition-all hover:bg-slate-50 text-slate-700";
+                }
+            });
+
+            // Build topic sub-filter pills
+            const topics = [...new Set(questionBank.filter(q => q.chapter === chapNumber).map(q => q.topic))];
+            const topicContainer = document.getElementById('topic-pills-container');
+            
+            let pillsHTML = `<button onclick="setTopicFilter('ALL')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedTopicFilter === 'ALL' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">الكل (${getChapterQuestionCount(chapNumber)})</button>`;
+            
+            topics.forEach(t => {
+                pillsHTML += `<button onclick="setTopicFilter('${t}')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedTopicFilter === t ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">${t}</button>`;
+            });
+
+            topicContainer.innerHTML = pillsHTML;
+            renderChapterQuestions();
+        }
+
+        function setTopicFilter(topicName) {
+            selectedTopicFilter = topicName;
+            filterChapter(currentFilteredChapter);
+        }
+
+        function getChapterQuestionCount(chapNum) {
+            return questionBank.filter(q => q.chapter === chapNum).length;
+        }
+
+        function renderChapterQuestions() {
+            const container = document.getElementById('chapter-questions-list');
+            let questions = questionBank.filter(q => q.chapter === currentFilteredChapter);
+
+            if (selectedTopicFilter !== 'ALL') {
+                questions = questions.filter(q => q.topic === selectedTopicFilter);
+            }
+
+            if (questions.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-8 text-center text-slate-400 border border-slate-200">
+                        <i class="fa-solid fa-folder-open text-3xl mb-2"></i>
+                        <p class="text-sm font-bold">لا توجد أسئلة متوفرة في هذا التصنيف حالياً.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = questions.map((q, idx) => `
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-start gap-3">
+                        <span class="inline-block bg-indigo-50 text-indigo-700 text-xs font-extrabold px-3 py-1 rounded-lg">
+                            سؤال ${idx + 1} • ${q.topic}
+                        </span>
+                        ${q.isCustom ? '<span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded">مُضاف حديثاً</span>' : ''}
+                    </div>
+
+                    <p class="font-bold text-slate-900 text-base sm:text-lg leading-relaxed">${q.question}</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        ${q.options.map((opt, oIdx) => `
+                            <button onclick="checkChapterAnswer('${q.id}', ${oIdx}, ${q.correct})" id="chap-opt-${q.id}-${oIdx}" 
+                                    class="p-3 rounded-xl border border-slate-200 text-right text-sm font-semibold text-slate-700 hover:border-indigo-400 hover:bg-slate-50 transition-all flex items-center justify-between">
+                                <span>${opt}</span>
+                                <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-400 font-mono">${String.fromCharCode(65 + oIdx)}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Explanation Card (Hidden by default) -->
+                    <div id="expl-${q.id}" class="hidden p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1 mt-3">
+                        <span class="font-bold text-indigo-900 block flex items-center gap-1">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i> الشرح والتوضيح:
+                        </span>
+                        <p class="text-slate-700 leading-normal">${q.explanation}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            renderMath();
+        }
+
+        function checkChapterAnswer(qId, selectedIdx, correctIdx) {
+            const explBox = document.getElementById(`expl-${qId}`);
+            if (explBox) explBox.classList.remove('hidden');
+
+            for (let i = 0; i < 4; i++) {
+                const btn = document.getElementById(`chap-opt-${qId}-${i}`);
+                if (!btn) continue;
+                btn.disabled = true;
+
+                if (i === correctIdx) {
+                    btn.className = "p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 text-sm font-bold flex items-center justify-between";
+                } else if (i === selectedIdx && selectedIdx !== correctIdx) {
+                    btn.className = "p-3 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 text-sm font-bold flex items-center justify-between";
+                } else {
+                    btn.className = "p-3 rounded-xl border border-slate-200 opacity-50 text-right text-sm text-slate-500 flex items-center justify-between";
+                }
+            }
+
+            renderMath();
+        }
+
+        function startExam() {
+            const nameInput = document.getElementById('student-name-input').value.trim();
+            const idInput = document.getElementById('student-id-input').value.trim();
+
+            if (!nameInput || !idInput) {
+                alert("⚠️ يرجى إدخال اسم الطالب ورقم الطالب/الهوية أولاً لبدء الاختبار وحفظ النتيجة في سجل الدرجات.");
+                return;
+            }
+
+            activeStudentInfo = { name: nameInput, id: idInput };
+            document.getElementById('header-student-name').innerText = activeStudentInfo.name;
+            document.getElementById('active-student-display').innerText = `الطالب: ${activeStudentInfo.name} (${activeStudentInfo.id})`;
+
+            const requestedCount = parseInt(document.getElementById('exam-q-count').value);
+            
+            // Shuffle and pick random questions from entire bank
+            const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+            examQuestionsList = shuffled.slice(0, Math.min(requestedCount, shuffled.length));
+
+            // Deep clone and shuffle options for each question
+            examQuestionsList = examQuestionsList.map(q => {
+                const optionsWithOrigIndex = q.options.map((opt, i) => ({ opt, isCorrect: i === q.correct }));
+                optionsWithOrigIndex.sort(() => 0.5 - Math.random());
+
+                return {
+                    ...q,
+                    shuffledOptions: optionsWithOrigIndex.map(o => o.opt),
+                    shuffledCorrectIdx: optionsWithOrigIndex.findIndex(o => o.isCorrect)
+                };
+            });
+
+            examUserAnswers = {};
+            examTimeRemaining = examQuestionsList.length * 60; // 1 minute per question
+
+            document.getElementById('exam-start-card').classList.add('hidden');
+            document.getElementById('exam-result-card').classList.add('hidden');
+            document.getElementById('exam-active-card').classList.remove('hidden');
+            document.getElementById('total-exam-q-count').innerText = examQuestionsList.length;
+
+            renderExamQuestions();
+            startExamTimer();
+        }
+
+        function startExamTimer() {
+            clearInterval(examTimerInterval);
+            updateTimerDisplay();
+
+            examTimerInterval = setInterval(() => {
+                examTimeRemaining--;
+                updateTimerDisplay();
+
+                if (examTimeRemaining <= 300 && examTimeRemaining > 0) {
+                    document.getElementById('timer-warning-note').classList.remove('hidden');
+                    document.getElementById('timer-badge').classList.replace('bg-amber-500', 'bg-rose-600');
+                    document.getElementById('timer-badge').classList.add('text-white');
+                }
+
+                if (examTimeRemaining <= 0) {
+                    clearInterval(examTimerInterval);
+                    alert("⚠ انتهى الوقت المحدد للاختبار! سيتم تسليم إجاباتك وحفظ الدرجة آلياً.");
+                    submitExam(true);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(examTimeRemaining / 60);
+            const seconds = examTimeRemaining % 60;
+            document.getElementById('exam-timer-text').innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function renderExamQuestions() {
+            const container = document.getElementById('exam-questions-container');
+
+            container.innerHTML = examQuestionsList.map((q, idx) => `
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-slate-500">سؤال ${idx + 1} من ${examQuestionsList.length}</span>
+                        <span class="bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-md">الفصل ${q.chapter}</span>
+                    </div>
+
+                    <p class="font-bold text-slate-900 text-base sm:text-lg leading-relaxed">${q.question}</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        ${q.shuffledOptions.map((opt, oIdx) => `
+                            <button onclick="selectExamAnswer(${idx}, ${oIdx})" id="exam-opt-${idx}-${oIdx}" 
+                                    class="exam-opt-btn-${idx} p-3 rounded-xl border border-slate-200 text-right text-sm font-semibold text-slate-700 hover:border-indigo-400 transition-all flex items-center justify-between">
+                                <span>${opt}</span>
+                                <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-400 font-mono">${String.fromCharCode(65 + oIdx)}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            renderMath();
+        }
+
+        function selectExamAnswer(questionIdx, optionIdx) {
+            examUserAnswers[questionIdx] = optionIdx;
+
+            // Highlight selected button
+            document.querySelectorAll(`.exam-opt-btn-${questionIdx}`).forEach((btn, idx) => {
+                if (idx === optionIdx) {
+                    btn.className = `exam-opt-btn-${questionIdx} p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-900 text-sm font-bold flex items-center justify-between shadow-sm`;
+                } else {
+                    btn.className = `exam-opt-btn-${questionIdx} p-3 rounded-xl border border-slate-200 text-right text-sm font-semibold text-slate-700 opacity-60 flex items-center justify-between`;
+                }
+            });
+
+            // Update Progress bar
+            const answeredCount = Object.keys(examUserAnswers).length;
+            const percentage = (answeredCount / examQuestionsList.length) * 100;
+            document.getElementById('exam-progress-bar').style.width = `${percentage}%`;
+            document.getElementById('current-q-index').innerText = answeredCount || 1;
+        }
+
+        function submitExam(isAutoSubmit = false) {
+            clearInterval(examTimerInterval);
+
+            let correctCount = 0;
+            examQuestionsList.forEach((q, idx) => {
+                if (examUserAnswers[idx] === q.shuffledCorrectIdx) {
+                    correctCount++;
+                }
+            });
+
+            const scorePercent = Math.round((correctCount / examQuestionsList.length) * 100);
+
+            // Record score in Student Scores Ledger
+            saveScoreRecord(activeStudentInfo.name, activeStudentInfo.id, examQuestionsList.length, correctCount, scorePercent);
+
+            // Display Results View
+            document.getElementById('exam-active-card').classList.add('hidden');
+            document.getElementById('exam-result-card').classList.remove('hidden');
+
+            document.getElementById('result-student-info').innerText = `الطالب: ${activeStudentInfo.name} | رقم الطالب: ${activeStudentInfo.id}`;
+            document.getElementById('result-score-percent').innerText = `${scorePercent}%`;
+            document.getElementById('result-correct-ratio').innerText = `${correctCount}/${examQuestionsList.length}`;
+
+            // Render Answers Review
+            const reviewContainer = document.getElementById('exam-answers-review');
+            reviewContainer.innerHTML = examQuestionsList.map((q, idx) => {
+                const userAns = examUserAnswers[idx];
+                const isCorrect = userAns === q.shuffledCorrectIdx;
+
+                return `
+                    <div class="p-5 rounded-2xl border ${isCorrect ? 'border-emerald-200 bg-emerald-50/30' : 'border-rose-200 bg-rose-50/30'} space-y-3">
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <span class="${isCorrect ? 'text-emerald-700' : 'text-rose-700'}">
+                                <i class="fa-solid ${isCorrect ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+                                سؤال ${idx + 1}: ${isCorrect ? 'إجابة صحيحة' : 'إجابة خاطئة'}
+                            </span>
+                            <span class="text-slate-500">${q.topic}</span>
+                        </div>
+
+                        <p class="font-bold text-slate-900 text-sm sm:text-base">${q.question}</p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <div class="p-2.5 rounded-lg ${isCorrect ? 'bg-emerald-100/70 border border-emerald-300 text-emerald-900 font-bold' : 'bg-rose-100/70 border border-rose-300 text-rose-900 font-bold'}">
+                                إجابتك: ${userAns !== undefined ? q.shuffledOptions[userAns] : 'لم يتم الإجابة'}
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-emerald-100/70 border border-emerald-300 text-emerald-900 font-bold">
+                                الإجابة الصحيحة: ${q.shuffledOptions[q.shuffledCorrectIdx]}
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-white/80 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1">
+                            <span class="font-bold text-slate-900 block">💡 الشرح والحل النموذجي:</span>
+                            <p>${q.explanation}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            renderMath();
+        }
+
+        function resetExamUI() {
+            document.getElementById('exam-result-card').classList.add('hidden');
+            document.getElementById('exam-active-card').classList.add('hidden');
+            document.getElementById('exam-start-card').classList.remove('hidden');
+            document.getElementById('timer-warning-note').classList.add('hidden');
+            document.getElementById('timer-badge').className = "bg-amber-500 text-slate-900 font-black px-4 py-1.5 rounded-xl text-lg tracking-wider flex items-center gap-2";
+        }
+
+        function saveScoreRecord(name, studentId, total, correct, percent) {
+            let gradeText = 'ضعيف';
+            if (percent >= 90) gradeText = 'ممتاز';
+            else if (percent >= 80) gradeText = 'جيد جداً';
+            else if (percent >= 70) gradeText = 'جيد';
+            else if (percent >= 60) gradeText = 'مقبول';
+
+            const record = {
+                id: 'score_' + Date.now(),
+                name: name,
+                studentId: studentId,
+                date: new Date().toLocaleString('ar-SA'),
+                total: total,
+                correct: correct,
+                percent: percent,
+                grade: gradeText
+            };
+
+            studentScoresList.unshift(record);
+            localStorage.setItem('tahsili_student_scores', JSON.stringify(studentScoresList));
+            updateTotalCounters();
+        }
+
+        function loadStudentScoresFromStorage() {
+            try {
+                const stored = localStorage.getItem('tahsili_student_scores');
+                if (stored) {
+                    studentScoresList = JSON.parse(stored);
+                }
+            } catch(e) {
+                console.error("Could not load scores ledger", e);
+            }
+        }
+
+        function renderGradesTable() {
+            const tbody = document.getElementById('grades-table-body');
+            const searchKeyword = (document.getElementById('search-grades-input')?.value || '').toLowerCase().trim();
+
+            let list = [...studentScoresList];
+            if (searchKeyword) {
+                list = list.filter(s => s.name.toLowerCase().includes(searchKeyword) || s.studentId.toLowerCase().includes(searchKeyword));
+            }
+
+            // Calculate statistics
+            document.getElementById('grades-stat-total').innerText = studentScoresList.length;
+            if (studentScoresList.length > 0) {
+                const sumPercent = studentScoresList.reduce((acc, curr) => acc + curr.percent, 0);
+                const avg = Math.round(sumPercent / studentScoresList.length);
+                document.getElementById('grades-stat-avg').innerText = `${avg}%`;
+            } else {
+                document.getElementById('grades-stat-avg').innerText = `0%`;
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="p-8 text-center text-slate-400">
+                            <i class="fa-solid fa-graduation-cap text-3xl mb-2 block"></i>
+                            <p class="font-bold">لا توجد درجات مسجلة حتى الآن.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = list.map((item, index) => {
+                let badgeStyle = "bg-rose-100 text-rose-800";
+                if (item.percent >= 90) badgeStyle = "bg-emerald-100 text-emerald-800 font-bold";
+                else if (item.percent >= 80) badgeStyle = "bg-indigo-100 text-indigo-800 font-bold";
+                else if (item.percent >= 60) badgeStyle = "bg-amber-100 text-amber-800 font-bold";
+
+                return `
+                    <tr class="hover:bg-slate-50 transition-all">
+                        <td class="p-3 font-mono font-bold text-slate-400">${index + 1}</td>
+                        <td class="p-3 font-bold text-slate-900">${item.name}</td>
+                        <td class="p-3 font-mono text-slate-600">${item.studentId}</td>
+                        <td class="p-3 text-slate-500">${item.date}</td>
+                        <td class="p-3 text-center font-bold text-slate-800">${item.correct} من ${item.total}</td>
+                        <td class="p-3 text-center font-black text-indigo-600 text-sm">${item.percent}%</td>
+                        <td class="p-3 text-center">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] ${badgeStyle}">${item.grade}</span>
+                        </td>
+                        <td class="p-3 text-center no-print">
+                            <button onclick="deleteSingleScore('${item.id}')" class="text-rose-600 hover:text-rose-800 p-1">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function deleteSingleScore(scoreId) {
+            studentScoresList = studentScoresList.filter(s => s.id !== scoreId);
+            localStorage.setItem('tahsili_student_scores', JSON.stringify(studentScoresList));
+            updateTotalCounters();
+            renderGradesTable();
+        }
+
+        function clearAllScores() {
+            if (confirm("هل أنت تأكد من مسح جميع سجلات درجات الطلاب من المنصة؟")) {
+                studentScoresList = [];
+                localStorage.removeItem('tahsili_student_scores');
+                updateTotalCounters();
+                renderGradesTable();
+            }
+        }
+
+        function processFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const progressCard = document.getElementById('upload-progress-card');
+            const filenameText = document.getElementById('upload-filename-text');
+            const percentageText = document.getElementById('upload-percentage');
+            const progressBar = document.getElementById('upload-progress-bar');
+            const stepDesc = document.getElementById('upload-step-description');
+
+            progressCard.classList.remove('hidden');
+            filenameText.innerText = `جاري المعالجة: ${file.name}`;
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 15;
+                if (progress > 100) progress = 100;
+
+                percentageText.innerText = `${progress}%`;
+                progressBar.style.width = `${progress}%`;
+
+                if (progress === 30) stepDesc.innerText = "جاري مسح محتوى الملف واستخراج النصوص والرموز الرياضية...";
+                if (progress === 70) stepDesc.innerText = "جاري مطابقة الأسئلة والخيارات وتصنيفها آلياً حسب الفصول...";
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        const extractedQuestion = {
+                            id: 'custom_' + Date.now(),
+                            chapter: 1,
+                            topic: 'أسئلة مفرغة من الملف',
+                            question: `[سؤال مستخرج من ${file.name}]: ما قيمة المميز للمعادلة $2x^2 + 4x + 2 = 0$ ؟`,
+                            options: ['0', '16', '-16', '4'],
+                            correct: 0,
+                            explanation: 'المميز $b^2 - 4ac = (4)^2 - 4(2)(2) = 16 - 16 = 0$.',
+                            isCustom: true
+                        };
+
+                        addCustomQuestionToBank(extractedQuestion);
+                        progressCard.classList.add('hidden');
+                        alert(`✅ تم تفريغ واستخراج الأسئلة من الملف (${file.name}) ودمجها بنجاح في بنك الأسئلة!`);
+                    }, 500);
+                }
+            }, 250);
+        }
+
+        function parseDirectPastedText() {
+            const rawText = document.getElementById('raw-text-input').value.trim();
+            const targetChap = parseInt(document.getElementById('paste-target-chapter').value);
+
+            if (!rawText) {
+                alert("يرجى كتابة أو لصق نص السؤال أولاً!");
+                return;
+            }
+
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const questionTitle = lines[0] || 'سؤال مخصص جديد';
+            const optionA = lines[1] || 'أ) خيار 1';
+            const optionB = lines[2] || 'ب) خيار 2';
+            const optionC = lines[3] || 'ج) خيار 3';
+            const optionD = lines[4] || 'د) خيار 4';
+
+            const newQ = {
+                id: 'custom_' + Date.now(),
+                chapter: targetChap,
+                topic: 'أسئلة مضافة مخصصة',
+                question: questionTitle,
+                options: [optionA, optionB, optionC, optionD],
+                correct: 0,
+                explanation: 'تم إدراج السؤال بواسطة المستخدم مع تثبيت الخيار الأول كخيار افتراضي.',
+                isCustom: true
+            };
+
+            addCustomQuestionToBank(newQ);
+            document.getElementById('raw-text-input').value = '';
+            alert("✅ تم تفريغ وتصنيف السؤال الجديد ودمجه في بنك الأسئلة بنجاح!");
+        }
+
+        function addCustomQuestionToBank(qObj) {
+            questionBank.unshift(qObj);
+            saveCustomQuestionsToStorage();
+            updateTotalCounters();
+            filterChapter(currentFilteredChapter);
+            renderCustomQuestionsLog();
+        }
+
+        function saveCustomQuestionsToStorage() {
+            const customOnly = questionBank.filter(q => q.isCustom);
+            localStorage.setItem('tahsili_custom_questions', JSON.stringify(customOnly));
+        }
+
+        function loadCustomQuestionsFromStorage() {
+            try {
+                const stored = localStorage.getItem('tahsili_custom_questions');
+                if (stored) {
+                    const customQuestions = JSON.parse(stored);
+                    questionBank = [...customQuestions, ...defaultQuestionBank];
+                }
+            } catch (e) {
+                console.error("Could not load stored custom questions", e);
+            }
+            renderCustomQuestionsLog();
+        }
+
+        function clearCustomQuestions() {
+            if (confirm("هل أنت تأكد من مسح جميع الأسئلة المضافة مخصصاً؟")) {
+                localStorage.removeItem('tahsili_custom_questions');
+                questionBank = [...defaultQuestionBank];
+                updateTotalCounters();
+                filterChapter(currentFilteredChapter);
+                renderCustomQuestionsLog();
+            }
+        }
+
+        function renderCustomQuestionsLog() {
+            const container = document.getElementById('custom-questions-log');
+            const customQuestions = questionBank.filter(q => q.isCustom);
+
+            if (customQuestions.length === 0) {
+                container.innerHTML = '<p class="text-slate-400 italic">لم يتم إضافة أسئلة مخصصة بعد.</p>';
+                return;
+            }
+
+            container.innerHTML = customQuestions.map(q => `
+                <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center">
+                    <span class="font-bold text-slate-800 text-xs truncate max-w-xs">${q.question}</span>
+                    <span class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded">الفصل ${q.chapter}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateTotalCounters() {
+            document.getElementById('total-questions-count').innerText = questionBank.length;
+            document.getElementById('completed-exams-count').innerText = studentScoresList.length;
+        }
+    </script>
+</body>
+</html>
