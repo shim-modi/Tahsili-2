@@ -56,6 +56,20 @@
         }
     </style>
 </head>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = "https://wdwpibwzrffeierquknu.supabase.co/rest/v1/";
+    const SUPABASE_ANON_KEY = "sb_publishable_bI5wPwfYqNGxWbOiwJlMuQ_j9NrNZme ";
+    
+    const supabaseClient = supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+    </script>
+
+
+
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
 
     <!-- Header -->
@@ -130,7 +144,7 @@
                 <p class="text-xs text-slate-500 mt-1" id="lock-modal-desc">يرجى إدخال الرمز السري المصرح به للدخول إلى التبويب المقفل</p>
             </div>
             <div class="space-y-2">
-                <input type="password" id="unlock-pin-input" maxlength="10" placeholder="أدخل الرمز السري (....)..." 
+                <input type="password" id="unlock-pin-input" maxlength="10" placeholder="أدخل الرمز السري (3212)..." 
                        onkeydown="if(event.key === 'Enter') checkUnlockPin()"
                        class="w-full text-center tracking-widest text-xl font-bold p-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                 <p id="lock-error-msg" class="text-xs text-rose-600 font-bold hidden flex items-center justify-center gap-1">
@@ -1195,29 +1209,57 @@
             document.getElementById('timer-badge').className = "bg-amber-500 text-slate-900 font-black px-4 py-1.5 rounded-xl text-lg tracking-wider flex items-center gap-2";
         }
 
-        function saveScoreRecord(name, studentId, total, correct, percent) {
-            let gradeText = 'ضعيف';
-            if (percent >= 90) gradeText = 'ممتاز';
-            else if (percent >= 80) gradeText = 'جيد جداً';
-            else if (percent >= 70) gradeText = 'جيد';
-            else if (percent >= 60) gradeText = 'مقبول';
+        async function saveScoreRecord(name, studentId, total, correct, percent) {
+let gradeText = 'ضعيف';
 
-            const record = {
-                id: 'score_' + Date.now(),
-                name: name,
-                studentId: studentId,
-                date: new Date().toLocaleString('ar-SA'),
-                total: total,
-                correct: correct,
-                percent: percent,
-                grade: gradeText
-            };
+if (percent >= 90) gradeText = 'ممتاز';
+else if (percent >= 80) gradeText = 'جيد جداً';
+else if (percent >= 70) gradeText = 'جيد';
+else if (percent >= 60) gradeText = 'مقبول';
 
-            studentScoresList.unshift(record);
-            localStorage.setItem('tahsili_student_scores', JSON.stringify(studentScoresList));
-            updateTotalCounters();
-        }
+const record = {
+    id: 'score_' + Date.now(),
+    name: name,
+    studentId: studentId,
+    date: new Date().toLocaleString('ar-SA'),
+    total: total,
+    correct: correct,
+    percent: percent,
+    grade: gradeText
+};
 
+// عرض النتيجة داخل الموقع
+studentScoresList.unshift(record);
+updateTotalCounters();
+
+// حفظ النتيجة في Supabase
+const { data, error } = await supabaseClient
+    .from('student_results')
+    .insert([record]);
+
+if (error) {
+    console.error('Supabase Error:', error);
+
+    // نرجع نحفظها محلياً كنسخة احتياطية
+    localStorage.setItem(
+        'tahsili_student_scores',
+        JSON.stringify(studentScoresList)
+    );
+
+    alert('⚠️ تعذر رفع النتيجة إلى قاعدة البيانات.');
+    return false;
+}
+
+console.log('✅ تم رفع النتيجة إلى Supabase');
+
+// نسخة محلية احتياطية
+localStorage.setItem(
+    'tahsili_student_scores',
+    JSON.stringify(studentScoresList)
+);
+
+return true;
+}
         function loadStudentScoresFromStorage() {
             try {
                 const stored = localStorage.getItem('tahsili_student_scores');
