@@ -1240,6 +1240,14 @@ const { data, error } = await supabaseClient
 if (error) {
     console.error('Supabase Error:', error);
 
+alert(
+    'خطأ Supabase:\n\n' +
+    'Code: ' + (error?.code || '') + '\n' +
+    'Message: ' + (error?.message || '') + '\n' +
+    'Details: ' + (error?.details || '') + '\n' +
+    'Hint: ' + (error?.hint || '')
+);
+
     // نرجع نحفظها محلياً كنسخة احتياطية
     localStorage.setItem(
         'tahsili_student_scores',
