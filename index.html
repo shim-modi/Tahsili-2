@@ -1258,7 +1258,7 @@ return true;
             document.getElementById('timer-badge').className = "bg-amber-500 text-slate-900 font-black px-4 py-1.5 rounded-xl text-lg tracking-wider flex items-center gap-2";
         }
 
-        async function saveScoreRecord(name, studentId, total, correct, percent) {
+        function saveScoreRecord(name, studentId, total, correct, percent) {
 let gradeText = 'ضعيف';
 
 if (percent >= 90) gradeText = 'ممتاز';
@@ -1277,45 +1277,35 @@ const record = {
     grade: gradeText
 };
 
-// عرض النتيجة داخل الموقع
+// 1. الحفظ المحلي أولاً
 studentScoresList.unshift(record);
-updateTotalCounters();
 
-// حفظ النتيجة في Supabase
-const { data, error } = await supabaseClient
-    .from('student_results')
-    .insert([record]);
-
-if (error) {
-    console.error('Supabase Error:', error);
-
-alert(
-    'خطأ Supabase:\n\n' +
-    'Code: ' + (error?.code || '') + '\n' +
-    'Message: ' + (error?.message || '') + '\n' +
-    'Details: ' + (error?.details || '') + '\n' +
-    'Hint: ' + (error?.hint || '')
-);
-
-    // نرجع نحفظها محلياً كنسخة احتياطية
-    localStorage.setItem(
-        'tahsili_student_scores',
-        JSON.stringify(studentScoresList)
-    );
-
-    alert('⚠️ تعذر رفع النتيجة إلى قاعدة البيانات.');
-    return false;
-}
-
-console.log('✅ تم رفع النتيجة إلى Supabase');
-
-// نسخة محلية احتياطية
 localStorage.setItem(
     'tahsili_student_scores',
     JSON.stringify(studentScoresList)
 );
 
-return true;
+updateTotalCounters();
+
+// 2. محاولة الرفع إلى Supabase بشكل منفصل
+if (typeof supabaseClient !== 'undefined') {
+
+    supabaseClient
+        .from('student_results')
+        .insert([record])
+        .then(({ data, error }) => {
+
+            if (error) {
+                console.error('Supabase Error:', error);
+                return;
+            }
+
+            console.log('✅ تم حفظ النتيجة في Supabase');
+        })
+        .catch(error => {
+            console.error('Supabase Connection Error:', error);
+        });
+}
 }
         function loadStudentScoresFromStorage() {
             try {
