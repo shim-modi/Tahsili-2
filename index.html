@@ -97,7 +97,7 @@
             <div class="max-w-7xl mx-auto flex space-x-2 space-x-reverse overflow-x-auto py-2 custom-scrollbar">
                 <button onclick="switchTab('chapters')" id="tab-btn-chapters" class="tab-btn active px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center space-x-2 space-x-reverse bg-indigo-600 text-white shadow-md">
                     <i class="fa-solid fa-book-open"></i>
-                    <span>الأسئلة والمسار التعليمي</span>
+                    <span>الأسئلة حسب الفصول</span>
                 </button>
                 <button onclick="switchTab('exam')" id="tab-btn-exam" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center space-x-2 space-x-reverse text-slate-300 hover:bg-slate-700 hover:text-white">
                     <i class="fa-solid fa-stopwatch text-amber-400"></i>
@@ -152,58 +152,32 @@
     <!-- Main View Container -->
     <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1 w-full">
 
-        <!-- TAB 1: CHAPTERS & LESSONS WITH PROGRESSION MASTERY -->
+        <!-- TAB 1: CHAPTERS & LESSONS -->
         <section id="tab-chapters" class="tab-content space-y-6">
-            
-            <!-- Chapter Mastery & Unlock Progression Header -->
-            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-xl border border-indigo-800/50 space-y-4 no-print">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div>
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-2">
-                            <i class="fa-solid fa-trophy"></i> مسار الإتقان التحصيلي المتدرج
-                        </span>
-                        <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">مسار التعلم بالتدرج شرط الإتقان</h2>
-                        <p class="text-xs text-indigo-200 mt-1">يجب الحصول على 80% على الأقل في اختبار إتقان الفصل لفتح الفصل التالي تلقائياً.</p>
-                    </div>
-                    <button onclick="resetChapterProgress()" class="text-xs text-slate-400 hover:text-rose-300 transition-colors underline flex items-center gap-1">
-                        <i class="fa-solid fa-rotate-left"></i> إعادة ضبط التقدم
-                    </button>
-                </div>
-
-                <!-- Progress Steps Indicator -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2" id="chapter-progression-cards">
-                    <!-- Populated via JS -->
-                </div>
-            </div>
-
             <!-- Chapter Selector Banner -->
             <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 no-print">
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-layer-group text-indigo-600"></i>
-                        اختر الفصل الدراسي (20 سؤالاً لكل فصل):
-                    </h2>
+                <h2 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-indigo-600"></i>
+                     اختر الفصل والتصنيف الدراسي:
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <button onclick="filterChapter(1)" id="chap-btn-1" class="chap-filter-btn active p-3 rounded-xl border text-right transition-all bg-indigo-50 border-indigo-500 text-indigo-900 shadow-sm">
+                        <span class="text-xs font-semibold text-indigo-600 block">الفصل الأول</span>
+                        <span class="font-bold text-sm">الدوال والمتباينات</span>
+                    </button>
+                    <button onclick="filterChapter(2)" id="chap-btn-2" class="chap-filter-btn p-3 rounded-xl border border-slate-200 text-right transition-all hover:bg-slate-50 text-slate-700">
+                        <span class="text-xs font-semibold text-slate-500 block">الفصل الثاني</span>
+                        <span class="font-bold text-sm">المصفوفات</span>
+                    </button>
+                    <button onclick="filterChapter(3)" id="chap-btn-3" class="chap-filter-btn p-3 rounded-xl border border-slate-200 text-right transition-all hover:bg-slate-50 text-slate-700">
+                        <span class="text-xs font-semibold text-slate-500 block">الفصل الثالث</span>
+                        <span class="font-bold text-sm">كثيرات الحدود ودوالها</span>
+                    </button>
+                    <button onclick="filterChapter(4)" id="chap-btn-4" class="chap-filter-btn p-3 rounded-xl border border-slate-200 text-right transition-all hover:bg-slate-50 text-slate-700">
+                        <span class="text-xs font-semibold text-slate-500 block">الفصل الرابع</span>
+                        <span class="font-bold text-sm">العلاقات والدوال العكسية والجذرية</span>
+                    </button>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="chapter-buttons-grid">
-                    <!-- Dynamic Buttons with Lock/Unlock icons -->
-                </div>
-            </div>
-
-            <!-- Chapter Mastery Quiz Start Banner -->
-            <div id="chapter-quiz-action-card" class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4 no-print">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-md">
-                        <i class="fa-solid fa-award"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-indigo-950 text-sm sm:text-base" id="current-chap-title-display">اختبار إتقان الفصل</h3>
-                        <p class="text-xs text-indigo-700">اختبر معلوماتك في أسئلة هذا الفصل (20 سؤالاً) لفتح الفصل التالي.</p>
-                    </div>
-                </div>
-                <button onclick="startCurrentChapterQuiz()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center gap-2 shrink-0">
-                    <i class="fa-solid fa-play"></i>
-                    <span>بدء اختبار إتقان الفصل الآن</span>
-                </button>
             </div>
 
             <!-- Topic Filter sub-pills -->
@@ -639,513 +613,170 @@
         };
         let targetLockedTab = null;
 
-        // Chapter Mastery State (Stored in localStorage)
-        let chapterMastery = {
-            1: false,
-            2: false,
-            3: false,
-            4: false
-        };
-
         // Student Scores Ledger Array
         let studentScoresList = [];
 
-        // Comprehensive Question Bank (20 questions per chapter = 80 questions total)
+        // Comprehensive Question Bank organized by Chapters and Topics
         const defaultQuestionBank = [
-            // ==========================================
-            // CHAPTER 1: الدوال والمتباينات (20 أسئلة)
-            // ==========================================
+            // CHAPTER 1: الدوال والمتباينات
             {
-                id: 'q1_1', chapter: 1, topic: 'خصائص الأعداد الحقيقية',
+                id: 'q1_1',
+                chapter: 1,
+                topic: 'خصائص الأعداد الحقيقية',
                 question: 'أي من الأعداد التالية ينتمي إلى مجموعة الأعداد غير النسبية (\\mathbb{I}$)؟',
                 options: ['\\sqrt{25}', '\\sqrt{7}', '0.75', '-\\frac{3}{4}'],
-                correct: 1, explanation: 'العدد $\\sqrt{7}$ غير نسبية لأن 7 ليس مربعاً كاملاً، أما $\\sqrt{25}=5$ فهو عدد كلي وصحيح ونسبي.'
+                correct: 1,
+                explanation: 'العدد $\\sqrt{7}$ غير نسبية لأن 7 ليس مربعاً كاملاً، أما $\\sqrt{25}=5$ فهو عدد كلي وصحيح ونسبي.'
             },
             {
-                id: 'q1_2', chapter: 1, topic: 'خصائص الأعداد الحقيقية',
+                id: 'q1_2',
+                chapter: 1,
+                topic: 'خصائص الأعداد الحقيقية',
                 question: 'النظير الضربي للعدد $-\\frac{3}{5}$ هو:',
                 options: ['\\frac{3}{5}', '-\\frac{5}{3}', '\\frac{5}{3}', '-\\frac{3}{5}'],
-                correct: 1, explanation: 'النظير الضربي لعدد هو مقلوبه مع المحافظة على الإشارة، ومقلوب $-\\frac{3}{5}$ هو $-\\frac{5}{3}$.'
+                correct: 1,
+                explanation: 'النظير الضربي لعدد هو مقلوبه مع المحافظة على الإشارة، ومقلوب $-\\frac{3}{5}$ هو $-\\frac{5}{3}$.'
             },
             {
-                id: 'q1_3', chapter: 1, topic: 'دوال خاصة',
+                id: 'q1_3',
+                chapter: 1,
+                topic: 'دوال خاصة',
                 question: 'ما قيمة دالة أكبر عدد صحيح $\\lfloor -2.4 \\rfloor$ ؟',
                 options: ['-2', '-3', '2', '3'],
-                correct: 1, explanation: 'دالة أكبر عدد صحيح تعطي أكبر عدد صحيح أقل من أو يساوي العدد. وأكبر عدد صحيح $\\le -2.4$ هو $-3$.'
+                correct: 1,
+                explanation: 'دالة أكبر عدد صحيح تعطي أكبر عدد صحيح أقل من أو يساوي العدد. وأكبر عدد صحيح $\\le -2.4$ هو $-3$.'
             },
             {
-                id: 'q1_4', chapter: 1, topic: 'دوال خاصة',
+                id: 'q1_4',
+                chapter: 1,
+                topic: 'دوال خاصة',
                 question: 'مدى دالة القيمة المطلقة $f(x) = |x - 3| + 2$ هو:',
                 options: ['[3, \\infty)', '[2, \\infty)', '(-\\infty, 2]', '\\mathbb{R}'],
-                correct: 1, explanation: 'دالة القيمة المطلقة الرئيسية $|x| \\ge 0$، وبالتالي فإن $|x-3|+2 \\ge 2$، فيكون المدى هو $[2, \\infty)$.'
+                correct: 1,
+                explanation: 'دالة القيمة المطلقة الرئيسية $|x| \\ge 0$، وبالتالي فإن $|x-3|+2 \\ge 2$، فيكون المدى هو $[2, \\infty)$.'
             },
             {
-                id: 'q1_5', chapter: 1, topic: 'المتباينات الخطية وأنظمتها',
+                id: 'q1_5',
+                chapter: 1,
+                topic: 'المتباينات الخطية وأنظمتها',
                 question: 'النقطة التي تمثل حلاً للنظام المتبين $y > 2x$ و $y < x + 4$ هي:',
                 options: ['(1, 3)', '(2, 1)', '(0, 0)', '(3, 2)'],
-                correct: 0, explanation: 'بالتعويض بالنقطة $(1,3)$: في المتباينة الأولى $3 > 2(1) \\Rightarrow 3 > 2$ (صحيحة). وفي الثانية $3 < 1 + 4 \\Rightarrow 3 < 5$ (صحيحة).'
-            },
-            {
-                id: 'q1_6', chapter: 1, topic: 'خصائص الأعداد الحقيقية',
-                question: 'النظير الجمعي للعدد $-4.5$ هو:',
-                options: ['4.5', '-4.5', '\\frac{1}{4.5}', '0'],
-                correct: 0, explanation: 'النظير الجمعي هو نفس العدد بإشارة معاكسة، إذن النظير الجمعي لـ $-4.5$ هو $4.5$.'
-            },
-            {
-                id: 'q1_7', chapter: 1, topic: 'خصائص الأعداد الحقيقية',
-                question: 'الخاصية الموضحة في العبارة $3(x + y) = 3x + 3y$ هي خاصية:',
-                options: ['التجميع', 'التبديل', 'التوزيع', 'الهوية الجمعية'],
-                correct: 2, explanation: 'ضرب عدد خارجي في مجموعة أقواس يمثل خاصية توزيع الضرب على الجمع.'
-            },
-            {
-                id: 'q1_8', chapter: 1, topic: 'العلاقات والدوال',
-                question: 'مجال العلاقة $\{(1, 2), (3, 4), (5, 6)\}$ هو:',
-                options: ['\\{1, 3, 5\\}', '\\{2, 4, 6\\}', '\\{1, 2, 3, 4, 5, 6\\}', '\\{0\\}'],
-                correct: 0, explanation: 'المجال يتكون من جميع المساقط الأولى (قيم $x$) أي $\\{1, 3, 5\\}$.'
-            },
-            {
-                id: 'q1_9', chapter: 1, topic: 'العلاقات والدوال',
-                question: 'إذا كان $f(x) = 2x^2 - 3x + 1$ فإن $f(-1)$ تساوي:',
-                options: ['6', '0', '-4', '2'],
-                correct: 0, explanation: '$f(-1) = 2(-1)^2 - 3(-1) + 1 = 2(1) + 3 + 1 = 6$.'
-            },
-            {
-                id: 'q1_10', chapter: 1, topic: 'دوال خاصة',
-                question: 'ما قيمة $\\lfloor 5.9 \\rfloor$ ؟',
-                options: ['5', '6', '5.9', '0'],
-                correct: 0, explanation: 'أكبر عدد صحيح أقل من أو يساوي $5.9$ هو $5$.'
-            },
-            {
-                id: 'q1_11', chapter: 1, topic: 'دوال خاصة',
-                question: 'رأس دالة القيمة المطلقة $f(x) = |x - 4| + 5$ هو النقطة:',
-                options: ['(4, 5)', '(-4, 5)', '(4, -5)', '(5, 4)'],
-                correct: 0, explanation: 'الصورة العامة هي $f(x) = a|x - h| + k$ ورأس الدالة هو $(h, k) = (4, 5)$.'
-            },
-            {
-                id: 'q1_12', chapter: 1, topic: 'المتباينات الخطية وأنظمتها',
-                question: 'الحد الصلب (الصلد) في تمثيل المتباينات الخطية بيانياً يُستخدم عندما تحتوي المتباينة على رمز:',
-                options: ['\\le \\text{ أو } \\ge', '> \\text{ أو } <', '= \\text{ فقط}', '\\neq'],
-                correct: 0, explanation: 'تُستخدم الخطوط المتصلة عندما تتضمن المتباينة المساواة $(\\le \\text{ أو } \\ge)$.'
-            },
-            {
-                id: 'q1_13', chapter: 1, topic: 'خصائص الأعداد الحقيقية',
-                question: 'الخصائص الآتية صحيحة لجميع الأعداد الحقيقية ما عدا:',
-                options: ['القسمة على الصفر معرفة', 'العنصر المحايد الضربي هو 1', 'العنصر المحايد الجمعي هو 0', 'حاصل ضرب أي عدد في نظيره الضربي يساوي 1'],
-                correct: 0, explanation: 'القسمة على الصفر عملية غير معرفة في الأعداد الحقيقية.'
-            },
-            {
-                id: 'q1_14', chapter: 1, topic: 'العلاقات والدوال',
-                question: 'تكون العلاقة دالة إذا كان:',
-                options: ['كل عنصر في المجال يرتبط بعنصر واحد فقط في المدى', 'كل عنصر في المدى يرتبط بعنصر واحد فقط في المجال', 'عدد عناصر المجال يساوي عدد عناصر المدى', 'المجال يحتوي أعداداً موجبة فقط'],
-                correct: 0, explanation: 'تعريف الدالة: ارتباط كل عنصر من المجال بعنصر واحد فقط في المدى.'
-            },
-            {
-                id: 'q1_15', chapter: 1, topic: 'البرمجة الخطية والحل الأمثل',
-                question: 'في البرمجة الخطية، تقع القيمة العظمى أو الصغرى للدالة الهدف دائماً عند:',
-                options: ['رؤوس منطقة الحل المقيدة', 'منتصف منطقة الحل', 'نقطة الأصل (0,0)', 'خارج منطقة الحل'],
-                correct: 0, explanation: 'حسب نظرية البرمجة الخطية، تقع القيم القصوى دائماً عند رؤوس (زوايا) منطقة الحل.'
-            },
-            {
-                id: 'q1_16', chapter: 1, topic: 'دوال خاصة',
-                question: 'مجال دالة القيمة المطلقة $f(x) = |x + 2| - 7$ هو:',
-                options: ['\\mathbb{R}', '[-7, \\infty)', '[2, \\infty)', '(-2, \\infty)'],
-                correct: 0, explanation: 'مجال أي دالة قيمة مطلقة خطية هو مجموعة الأعداد الحقيقية كافتها $\\mathbb{R}$.'
-            },
-            {
-                id: 'q1_17', chapter: 1, topic: 'خصائص الأعداد الحقيقية',
-                question: 'المجموعة $\\{1, 2, 3, 4, \\dots\\}$ تسمى مجموعة الأعداد:',
-                options: ['الطبيعية (\\mathbb{N})', 'الكلية (\\mathbb{W})', 'الصحيحة (\\mathbb{Z})', 'غير النسبية (\\mathbb{I})'],
-                correct: 0, explanation: 'تبدأ الأعداد الطبيعية $\\mathbb{N}$ من العدد 1 وتستمر بدون أعداد سالبة أو أجزاء عشرية.'
-            },
-            {
-                id: 'q1_18', chapter: 1, topic: 'العلاقات والدوال',
-                question: 'مدى العلاقة $\{(2, 5), (3, 5), (4, 8)\}$ هو:',
-                options: ['\\{5, 8\\}', '\\{2, 3, 4\\}', '\\{2, 3, 4, 5, 8\\}', '\\{5\\}'],
-                correct: 0, explanation: 'المدى هو مجموعة المساقط الثانية (قيم $y$) بدون تكرار: $\\{5, 8\\}$.'
-            },
-            {
-                id: 'q1_19', chapter: 1, topic: 'دوال خاصة',
-                question: 'أي الدوال التالية تُصنف كدالة درجية؟',
-                options: ['دالة أكبر عدد صحيح', 'دالة القيمة المطلقة', 'الدالة التربيعية', 'دالة الجذر التربيعي'],
-                correct: 0, explanation: 'تُعرف دالة أكبر عدد صحيح بالدالة الدرجية لأن تمثيلها البياني يشبه الدرجات.'
-            },
-            {
-                id: 'q1_20', chapter: 1, topic: 'المتباينات الخطية وأنظمتها',
-                question: 'النقطة (0, 0) تعتبر حلاً للمتباينة:',
-                options: ['2x + 3y < 5', 'x + y > 4', 'y \\ge 2x + 1', 'x - y \\le -3'],
-                correct: 0, explanation: 'بالتعويض بـ (0,0): $2(0) + 3(0) < 5 \\Rightarrow 0 < 5$ وهي عبارة صحيحة.'
+                correct: 0,
+                explanation: 'بالتعويض بالنقطة $(1,3)$: في المتباينة الأولى $3 > 2(1) \\Rightarrow 3 > 2$ (صحيحة). وفي الثانية $3 < 1 + 4 \\Rightarrow 3 < 5$ (صحيحة).'
             },
 
-            // ==========================================
-            // CHAPTER 2: المصفوفات (20 أسئلة)
-            // ==========================================
+            // CHAPTER 2: المصفوفات
             {
-                id: 'q2_1', chapter: 2, topic: 'مقدمة في المصفوفات',
+                id: 'q2_1',
+                chapter: 2,
+                topic: 'مقدمة في المصفوفات',
                 question: 'رتبة المصفوفة $A = \\begin{bmatrix} 2 & -1 & 0 \\\\ 5 & 3 & 4 \\end{bmatrix}$ هي:',
                 options: ['3 \\times 2', '2 \\times 3', '2 \\times 2', '3 \\times 3'],
-                correct: 1, explanation: 'تتكون المصفوفة من صفين وثلاثة أعمدة، إذن رتبتها هي $2 \\times 3$.'
+                correct: 1,
+                explanation: 'تتكون المصفوفة من صفين وثلاثة أعمدة، إذن رتبتها هي $2 \\times 3$.'
             },
             {
-                id: 'q2_2', chapter: 2, topic: 'ضرب المصفوفات والمحددات',
+                id: 'q2_2',
+                chapter: 2,
+                topic: 'ضرب المصفوفات والمحددات',
                 question: 'إذا كانت رتبة المصفوفة $A$ هي $2 \\times 3$ ورتبة المصفوفة $B$ هي $3 \\times 4$، فإن رتبة المصفوفة $A \\cdot B$ تكون:',
                 options: ['3 \\times 3', '2 \\times 4', '4 \\times 2', 'لا يمكن الضرب'],
-                correct: 1, explanation: 'شرط إمكانية الضرب محقق (عدد أعمدة الأول 3 يساوي صفوف الثاني 3)، والرتبة الناتجة تكون $2 \\times 4$.'
+                correct: 1,
+                explanation: 'شرط إمكانية الضرب محقق (عدد أعمدة الأول 3 يساوي صفوف الثاني 3)، والرتبة الناتجة تكون $2 \\times 4$.'
             },
             {
-                id: 'q2_3', chapter: 2, topic: 'ضرب المصفوفات والمحددات',
+                id: 'q2_3',
+                chapter: 2,
+                topic: 'ضرب المصفوفات والمحددات',
                 question: 'قيمة محددة المصفوفة $\\det \\begin{bmatrix} 4 & 2 \\\\ 3 & 5 \\end{bmatrix}$ تساوي:',
                 options: ['14', '26', '20', '6'],
-                correct: 0, explanation: 'قيمة المحدد الثنائي = $(4 \\times 5) - (2 \\times 3) = 20 - 6 = 14$.'
+                correct: 0,
+                explanation: 'قيمة المحدد الثنائي = (حاصل ضرب عناصر القطر الرئيس) - (حاصل ضرب عناصر القطر الآخر) = $(4 \\times 5) - (2 \\times 3) = 20 - 6 = 14$.'
             },
             {
-                id: 'q2_4', chapter: 2, topic: 'النظير الضربي وأنظمة المعادلات',
+                id: 'q2_4',
+                chapter: 2,
+                topic: 'النظير الضربي وأنظمة المعادلات',
                 question: 'تكون المصفوفة $\\begin{bmatrix} k & 4 \\\\ 3 & 6 \\end{bmatrix}$ ليس لها نظير ضربي إذا كانت قيمة $k$ تساوي:',
                 options: ['2', '8', '12', '0'],
-                correct: 0, explanation: 'لا يوجد نظير ضربي عندما يكون المحدد مساوياً للصفر: $6k - 12 = 0 \\Rightarrow k = 2$.'
-            },
-            {
-                id: 'q2_5', chapter: 2, topic: 'مقدمة في المصفوفات',
-                question: 'مصفوفة المحايد لعملية ضرب المصفوفات الثنائية $I_2$ هي:',
-                options: ['\\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}', '\\begin{bmatrix} 0 & 1 \\\\ 1 & 0 \\end{bmatrix}', '\\begin{bmatrix} 1 & 1 \\\\ 1 & 1 \\end{bmatrix}', '\\begin{bmatrix} 0 & 0 \\\\ 0 & 0 \\end{bmatrix}'],
-                correct: 0, explanation: 'مصفوفة المحايد هي مصفوفة مربعة عناصر قطرها الرئيس 1 وباقي العناصر أصغار.'
-            },
-            {
-                id: 'q2_6', chapter: 2, topic: 'العمليات على المصفوفات',
-                question: 'شرط إمكانية جمع مصفوفتين هو أن تكونا:',
-                options: ['من نفس الرتبة', 'مربعتين', 'لهما نفس عدد الصفوف فقط', 'محدداتهما غير صفرية'],
-                correct: 0, explanation: 'جمع وطرح المصفوفات يتطلب مطابقة الرتب تماماً.'
-            },
-            {
-                id: 'q2_7', chapter: 2, topic: 'العمليات على المصفوفات',
-                question: 'ناتج $2 \\cdot \\begin{bmatrix} 3 & -1 \\\\ 0 & 4 \\end{bmatrix}$ يساوي:',
-                options: ['\\begin{bmatrix} 6 & -2 \\\\ 0 & 8 \\end{bmatrix}', '\\begin{bmatrix} 5 & 1 \\\\ 2 & 6 \\end{bmatrix}', '\\begin{bmatrix} 6 & -1 \\\\ 0 & 4 \\end{bmatrix}', '\\begin{bmatrix} 3 & -2 \\\\ 0 & 8 \\end{bmatrix}'],
-                correct: 0, explanation: 'ضرب مصفوفة في عدد ثابت يعني ضرب جميع عناصر المصفوفة في هذا العدد.'
-            },
-            {
-                id: 'q2_8', chapter: 2, topic: 'مقدمة في المصفوفات',
-                question: 'المصفوفة التي تتكون من صف واحد فقط تسمى:',
-                options: ['مصفوفة صف', 'مصفوفة عمود', 'مصفوفة مربعة', 'مصفوفة صفرية'],
-                correct: 0, explanation: 'مصفوفة الصف تتكون من صف واحد وأي عدد من الأعمدة (رتبتها $1 \\times n$).'
-            },
-            {
-                id: 'q2_9', chapter: 2, topic: 'النظير الضربي وأنظمة المعادلات',
-                question: 'قاعدة كرامر تُستخدم لحل أنظمة المعادلات باستعمال:',
-                options: ['المحددات', 'المصفوفات الصفرية', 'القسمة المطولة', 'البرمجة الخطية'],
-                correct: 0, explanation: 'تعتمد قاعدة كرامر كلياً على حساب المحددات ($D, D_x, D_y$).'
-            },
-            {
-                id: 'q2_10', chapter: 2, topic: 'مقدمة في المصفوفات',
-                question: 'في المصفوفة $A = \\begin{bmatrix} 5 & 8 & 3 \\\\ 1 & 9 & 7 \\end{bmatrix}$، العنصر $a_{23}$ هو:',
-                options: ['7', '8', '3', '1'],
-                correct: 0, explanation: '$a_{23}$ يعبر عن العنصر الواقع في الصف الثاني والعمود الثالث، وهو الرقم 7.'
-            },
-            {
-                id: 'q2_11', chapter: 2, topic: 'ضرب المصفوفات والمحددات',
-                question: 'إذا كان محدد مصفوفة $|A| = 0$ فإن هذه المصفوفة تسمى مصفوفة:',
-                options: ['منفردة (لا نظير لها)', 'محايدة', 'قطرية', 'متماثلة'],
-                correct: 0, explanation: 'المصفوفة المنفردة هي التي المحدد الخاص بها يساوي صفر ولا يوجد لها نظير ضربي.'
-            },
-            {
-                id: 'q2_12', chapter: 2, topic: 'ضرب المصفوفات والمحددات',
-                question: 'عملية ضرب المصفوفات بشكل عام هي عملية:',
-                options: ['غير إبدالية ($AB \\neq BA$)', 'إبدالية دائماً', 'غير تجميعية', 'تؤدي دائماً لمصفوفة صفرية'],
-                correct: 0, explanation: 'ضرب المصفوفات ليس إبدالياً في الحالة العامة.'
-            },
-            {
-                id: 'q2_13', chapter: 2, topic: 'النظير الضربي وأنظمة المعادلات',
-                question: 'النظير الضربي للمصفوفة $I = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$ هو:',
-                options: ['نفسها $I$', 'المصفوفة الصفرية', '-\\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}', 'لا يوجد'],
-                correct: 0, explanation: 'مصفوفة المحايد ضربها في نفسها يعطي مصفوفة المحايد، لذا فنظيرها الضربي هو نفسها.'
-            },
-            {
-                id: 'q2_14', chapter: 2, topic: 'مقدمة في المصفوفات',
-                question: 'قيمة $x$ التي تجعل المصفوفتين $\\begin{bmatrix} 2x & 4 \\end{bmatrix} = \\begin{bmatrix} 10 & 4 \\end{bmatrix}$ متساوين هي:',
-                options: ['5', '10', '2', '20'],
-                correct: 0, explanation: 'بمساواة العناصر المتناظرة: $2x = 10 \\Rightarrow x = 5$.'
-            },
-            {
-                id: 'q2_15', chapter: 2, topic: 'العمليات على المصفوفات',
-                question: 'المحياد الجمعي للمصفوفات هو:',
-                options: ['المصفوفة الصفرية', 'مصفوفة الوحدة', 'مصفوفة الصف', 'لا يوجد'],
-                correct: 0, explanation: 'إضافة المصفوفة الصفرية لأي مصفوفة لا يغير قيم عناصرها.'
-            },
-            {
-                id: 'q2_16', chapter: 2, topic: 'ضرب المصفوفات والمحددات',
-                question: 'مساحة المثلث الذي رؤوسه معلومة في مستوى إحداثي يمكن حسابها باستخدام:',
-                options: ['المحددات من الرتبة $3 \\times 3$', 'مصفوفة العمود', 'قاعدة كرامر للخطوط', 'دالة اكبر عدد صحيح'],
-                correct: 0, explanation: 'تُستخدم المحددات الثنائية والثلاثية لحساب مساحات الأشكال الهندسية كالمثلثات.'
-            },
-            {
-                id: 'q2_17', chapter: 2, topic: 'ضرب المصفوفات والمحددات',
-                question: 'إذا كان ضرب مصفوفتين $A_{1 \\times 3} \\cdot B_{3 \\times 1}$ ممكناً، فإن رتبة الناتج هي:',
-                options: ['1 \\times 1', '3 \\times 3', '1 \\times 3', '3 \\times 1'],
-                correct: 0, explanation: 'الرتبة الناتجة تؤخذ من الصفوف الخارجية: $1 \\times 1$ (مصفوفة ذات عنصر واحد).'
-            },
-            {
-                id: 'q2_18', chapter: 2, topic: 'النظير الضربي وأنظمة المعادلات',
-                question: 'قيمة المحدد $\\det \\begin{bmatrix} 3 & 0 \\\\ 0 & 4 \\end{bmatrix}$ تساوي:',
-                options: ['12', '0', '7', '-12'],
-                correct: 0, explanation: '$(3 \\times 4) - (0 \\times 0) = 12$.'
-            },
-            {
-                id: 'q2_19', chapter: 2, topic: 'مقدمة في المصفوفات',
-                question: 'تكون المصفوفة مربعة إذا كان:',
-                options: ['عدد الصفوف يساوي عدد الأعمدة', 'جميع عناصرها أصفار', 'جميع عناصرها آحاد', 'عدد الصفوف أكبر من الأعمدة'],
-                correct: 0, explanation: 'المصفوفة المربعة هي التي يتساوى فيها عدد الصفوف مع عدد الأعمدة ($m = n$).'
-            },
-            {
-                id: 'q2_20', chapter: 2, topic: 'العمليات على المصفوفات',
-                question: 'طرح مصفوفتين $A - B$ يطابق العملية:',
-                options: ['A + (-B)', 'A \\cdot B^{-1}', 'B - A', '-A - B'],
-                correct: 0, explanation: 'طرح المصفوفات هو جمع المصفوفة الأولى مع النظير الجمعي للمصفوفة الثانية.'
+                correct: 0,
+                explanation: 'لا يوجد نظير ضربي للمصفوفة عندما يكون محددها مساوياً للصفر: $(k \\cdot 6) - (4 \\cdot 3) = 0 \\Rightarrow 6k - 12 = 0 \\Rightarrow k = 2$.'
             },
 
-            // ==========================================
-            // CHAPTER 3: كثيرات الحدود ودوالها (20 أسئلة)
-            // ==========================================
+            // CHAPTER 3: كثيرات الحدود ودوالها
             {
-                id: 'q3_1', chapter: 3, topic: 'الأعداد المركبة والمميز',
+                id: 'q3_1',
+                chapter: 3,
+                topic: 'الأعداد المركبة والمميز',
                 question: 'ما قيمة $i^{38}$ حيث $i = \\sqrt{-1}$ ؟',
                 options: ['1', '-1', 'i', '-i'],
-                correct: 1, explanation: '$38 \\div 4 = 9$ والباقي $2$. إذن $i^{38} = i^2 = -1$.'
+                correct: 1,
+                explanation: 'نقسم الأس على 4: $38 \\div 4 = 9$ والباقي $2$. إذن $i^{38} = i^2 = -1$.'
             },
             {
-                id: 'q3_2', chapter: 3, topic: 'الأعداد المركبة والمميز',
+                id: 'q3_2',
+                chapter: 3,
+                topic: 'الأعداد المركبة والمميز',
                 question: 'نوع جذور المعادلة $x^2 - 4x + 5 = 0$ باستخدام المميز هو:',
                 options: ['جذران حقيقيان نسببان', 'جذر حقيقي واحد مكرر', 'جذران مركبان مترافقان', 'جذران غير نسببين'],
-                correct: 2, explanation: 'المميز $b^2 - 4ac = (-4)^2 - 4(1)(5) = 16 - 20 = -4 < 0$. وبما أنه سالب، فالجذران مركبان مترافقان.'
+                correct: 2,
+                explanation: 'المميز $b^2 - 4ac = (-4)^2 - 4(1)(5) = 16 - 20 = -4 < 0$. وبما أن المميز سالب، فالجذران مركبان مترافقان.'
             },
             {
-                id: 'q3_3', chapter: 3, topic: 'العمليات وقسمة كثيرات الحدود',
+                id: 'q3_3',
+                chapter: 3,
+                topic: 'العمليات وقسمة كثيرات الحدود',
                 question: 'باقي قسمة كثيرة الحدود $f(x) = x^3 - 2x^2 + 3x - 5$ على $(x - 2)$ يساوي:',
                 options: ['1', '-5', '7', '0'],
-                correct: 0, explanation: 'حسب نظرية الباقي، نعوض $x = 2$: $f(2) = (2)^3 - 2(2)^2 + 3(2) - 5 = 8 - 8 + 6 - 5 = 1$.'
+                correct: 0,
+                explanation: 'حسب نظرية الباقي، نعوض $x = 2$ في الدالة: $f(2) = (2)^3 - 2(2)^2 + 3(2) - 5 = 8 - 8 + 6 - 5 = 1$.'
             },
             {
-                id: 'q3_4', chapter: 3, topic: 'دوال الجذور والأصفار',
+                id: 'q3_4',
+                chapter: 3,
+                topic: 'دوال الجذور والأصفار',
                 question: 'درجة كثيرة الحدود $f(x) = 4x^5 - 2x^3 + 7x^2 - 9$ والمعامل الرئيس لها هما على التوالي:',
                 options: ['الدرجة 5 والمعامل الرئيس 4', 'الدرجة 3 والمعامل الرئيس -2', 'الدرجة 5 والمعامل الرئيس -9', 'الدرجة 2 والمعامل الرئيس 7'],
-                correct: 0, explanation: 'درجة كثيرة الحدود هي أكبر أس (5)، والمعامل الرئيس هو معامل هذا الحد (4).'
-            },
-            {
-                id: 'q3_5', chapter: 3, topic: 'الأعداد المركبة والمميز',
-                question: 'ناتج تبسيط العبارة $(3 + 2i) + (1 - 5i)$ هو:',
-                options: ['4 - 3i', '4 + 7i', '2 - 3i', '4 - 7i'],
-                correct: 0, explanation: 'نجمع الأجزاء الحقيقية والتخيلية: $(3 + 1) + (2i - 5i) = 4 - 3i$.'
-            },
-            {
-                id: 'q3_6', chapter: 3, topic: 'الأعداد المركبة والمميز',
-                question: 'مرافق العدد المركب $2 + 3i$ هو:',
-                options: ['2 - 3i', '-2 - 3i', '-2 + 3i', '3 + 2i'],
-                correct: 0, explanation: 'مرافق العدد المركب $a + bi$ هو $a - bi$ (تغيير إشارة الجزء التخيلي فقط).'
-            },
-            {
-                id: 'q3_7', chapter: 3, topic: 'الأعداد المركبة والمميز',
-                question: 'ناتج ضرب العدد المركب في مرافقه $(2 + 3i)(2 - 3i)$ يساوي:',
-                options: ['13', '-5', '13 - 12i', '4'],
-                correct: 0, explanation: '$(a+bi)(a-bi) = a^2 + b^2 = 2^2 + 3^2 = 4 + 9 = 13$.'
-            },
-            {
-                id: 'q3_8', chapter: 3, topic: 'الأعداد المركبة والمميز',
-                question: 'قيمة $i^{100}$ تساوي:',
-                options: ['1', '-1', 'i', '0'],
-                correct: 0, explanation: '100 تقبل القسمة على 4 بدون باقي، إذن $i^{100} = 1$.'
-            },
-            {
-                id: 'q3_9', chapter: 3, topic: 'العمليات وقسمة كثيرات الحدود',
-                question: 'إذا كان باقي قسمة $f(x)$ على $(x - c)$ يساوي الصفر، فإن $(x - c)$ يُسمى:',
-                options: ['عاملاً من عوامل كثيرة الحدود', 'محياداً ضربياً', 'نظيراً جمعياً', 'جذراً مركباً مترافقاً'],
-                correct: 0, explanation: 'حسب نظرية العوامل، يكون $(x-c)$ عاملاً إذا وفقط إذا كان الباقي $f(c) = 0$.'
-            },
-            {
-                id: 'q3_10', chapter: 3, topic: 'دوال الجذور والأصفار',
-                question: 'حسب النظرية الأساسية في الجبر، فإن كثيرة الحدود من الدرجة الرابعة لها كحد أقصى مركب:',
-                options: ['4 جذور', '3 جذور', '2 جذور', 'جذر واحد'],
-                correct: 0, explanation: 'عدد الجذور المركبة يساوي بالضبط درجة كثيرة الحدود.'
-            },
-            {
-                id: 'q3_11', chapter: 3, topic: 'الأعداد المركبة والمميز',
-                question: 'تكون المعادلة التربيعية لها جذر حقيقي واحد مكرر مرتين إذا كانت قيمة المميز:',
-                options: ['تساوي الصفر', 'موجبة ومربع كامل', 'سالبة', 'أكبر من 100'],
-                correct: 0, explanation: 'المميز $b^2 - 4ac = 0$ يعني وجود جذر حقيقي واحد مكرر مرتين.'
-            },
-            {
-                id: 'q3_12', chapter: 3, topic: 'العمليات وقسمة كثيرات الحدود',
-                question: 'قسمة كثيرات الحدود باستخدام القسمة التركيبية تتطلب أن يكون مقسوم عليه على الصورة:',
-                options: ['x - r (درجة أولى ومعامل x يساوي 1)', 'x^2 + r', 'مصفوفة ثنائية', 'كثيرة حدود ثلاثية'],
-                correct: 0, explanation: 'تُطبق القسمة التركيبية عندما يكون المقسوم عليه خطياً المعامل لـ $x$ فيه هو 1.'
-            },
-            {
-                id: 'q3_13', chapter: 3, topic: 'الأعداد المركبة والمميز',
-                question: 'تبسيط العبارة $\\sqrt{-36}$ يعطي:',
-                options: ['6i', '-6', '6', '-6i'],
-                correct: 0, explanation: '$\\sqrt{-36} = \\sqrt{36} \\cdot \\sqrt{-1} = 6i$.'
-            },
-            {
-                id: 'q3_14', chapter: 3, topic: 'الأعداد المركبة والمميز',
-                question: 'القانون العام لحل المعادلة التربيعية $ax^2 + bx + c = 0$ هو:',
-                options: ['x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}', 'x = \\frac{b \\pm \\sqrt{b^2 - 4ac}}{a}', 'x = -b \\pm \\sqrt{ac}', 'x = \\frac{-b}{2a}'],
-                correct: 0, explanation: 'القانون العام الشهير لحل المعادلات التربيعية هو $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$.'
-            },
-            {
-                id: 'q3_15', chapter: 3, topic: 'العمليات وقسمة كثيرات الحدود',
-                question: 'مجموع درجات الحدود في كثيرة الحدود $f(x, y) = 3x^2y^3 + 5x^4 - 2$ هو:',
-                options: ['5', '4', '2', '9'],
-                correct: 0, explanation: 'درجة الحد الأول هي $2 + 3 = 5$ والحد الثاني 4، فتكون درجة كثيرة الحدود هي أكبر درجة حد وهو 5.'
-            },
-            {
-                id: 'q3_16', chapter: 3, topic: 'دوال الجذور والأصفار',
-                question: 'قانون ديكارت للإشارات يُستخدم لتحديد:',
-                options: ['عدد الأصفار الحقيقية الموجبة والسالبة والمتخيلة', 'رتبة المصفوفات', 'النظير الضربي للمصفوفة', 'مجال دالة أكبر عدد صحيح'],
-                correct: 0, explanation: 'قانون ديكارت يدرس تغيرات إشارات معاملات $f(x)$ و $f(-1)$ لتحديد عدد الجذور الحقيقية.'
-            },
-            {
-                id: 'q3_17', chapter: 3, topic: 'دوال الجذور والأصفار',
-                question: 'إذا كان $2 + i$ أحدا جذور دالة كثيرات حدود ذات معاملات حقيقية، فإن الجذر الآخر الحتمي هو:',
-                options: ['2 - i', '-2 + i', '-2 - i', 'i - 2'],
-                correct: 0, explanation: 'الجذور المركبة دائماً تأتي في أزواج مترافقة.'
-            },
-            {
-                id: 'q3_18', chapter: 3, topic: 'العمليات وقسمة كثيرات الحدود',
-                question: 'ناتج $x^3 \\cdot x^5$ يساوي:',
-                options: ['x^8', 'x^{15}', 'x^2', '3x^5'],
-                correct: 0, explanation: 'في ضرب الأسس ذات القواعد المتشابهة نجمع الأسس: $3 + 5 = 8$.'
-            },
-            {
-                id: 'q3_19', chapter: 3, topic: 'الأعداد المركبة والمميز',
-                question: 'قيمة $i^3$ تساوي:',
-                options: ['-i', 'i', '1', '-1'],
-                correct: 0, explanation: '$i^3 = i^2 \\cdot i = -1 \\cdot i = -i$.'
-            },
-            {
-                id: 'q3_20', chapter: 3, topic: 'دوال الجذور والأصفار',
-                question: 'الدالة الزوجية الدرجة ومعاملها الرئيس موجب يكون سلوك طرفي تمثيلها البياني:',
-                options: ['كلا الطرفين يتجهان لأعلى (+\\infty)', 'كلا الطرفين يتجهان لأسفل (-\\infty)', 'طرف لأعلى وطرف لأسفل', 'تتجه للصفر'],
-                correct: 0, explanation: 'كثيرات الحدود زوجية الدرجة ذات المعامل الرئيس الموجب تتجه أطرافها إلى الأعلى من الجانبين.'
+                correct: 0,
+                explanation: 'درجة كثيرة الحدود هي أكبر أس للمتغير فيها (وهو 5)، والمعامل الرئيس هو معامل هذا الحد (وهو 4).'
             },
 
-            // ==========================================
-            // CHAPTER 4: العلاقات والدوال العكسية والجذرية (20 أسئلة)
-            // ==========================================
+            // CHAPTER 4: العلاقات والدوال العكسية والجذرية
             {
-                id: 'q4_1', chapter: 4, topic: 'تركيب الدوال والدوال العكسية',
+                id: 'q4_1',
+                chapter: 4,
+                topic: 'تركيب الدوال والدوال العكسية',
                 question: 'إذا كان $f(x) = x^2 + 1$ و $g(x) = 2x$ ، فإن قيمة $[f \\circ g](3)$ تساوي:',
                 options: ['37', '19', '12', '36'],
-                correct: 0, explanation: '$g(3) = 2(3) = 6$ ، ثم نعوض في $f$: $f(6) = (6)^2 + 1 = 37$.'
+                correct: 0,
+                explanation: 'نحسب أولاً $g(3) = 2(3) = 6$ ، ثم نعوض الناتج في $f$: $f(6) = (6)^2 + 1 = 36 + 1 = 37$.'
             },
             {
-                id: 'q4_2', chapter: 4, topic: 'تركيب الدوال والدوال العكسية',
+                id: 'q4_2',
+                chapter: 4,
+                topic: 'تركيب الدوال والدوال العكسية',
                 question: 'الدالة العكسية $f^{-1}(x)$ للدالة $f(x) = 2x - 6$ هي:',
                 options: ['f^{-1}(x) = \\frac{x + 6}{2}', 'f^{-1}(x) = \\frac{x - 6}{2}', 'f^{-1}(x) = 6x - 2', 'f^{-1}(x) = -2x + 6'],
-                correct: 0, explanation: '$x = 2y - 6 \\Rightarrow 2y = x + 6 \\Rightarrow y = \\frac{x + 6}{2}$.'
+                correct: 0,
+                explanation: 'نضع $y = 2x - 6$ ثم نبدل $x$ و $y$: $x = 2y - 6 \\Rightarrow 2y = x + 6 \\Rightarrow y = \\frac{x + 6}{2}$.'
             },
             {
-                id: 'q4_3', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
+                id: 'q4_3',
+                chapter: 4,
+                topic: 'الدوال والجذور والأسس النسبية',
                 question: 'مجال دالة الجذر التربيعي $f(x) = \\sqrt{3x - 12}$ هو:',
                 options: ['[4, \\infty)', '(4, \\infty)', '[-4, \\infty)', '\\mathbb{R}'],
-                correct: 0, explanation: 'ما تحت الجذر يجب أن يكون غير سالب: $3x - 12 \\ge 0 \\Rightarrow x \\ge 4$.'
+                correct: 0,
+                explanation: 'ما تحت الجذر يجب أن يكون أكبر من أو يساوي الصفر: $3x - 12 \\ge 0 \\Rightarrow 3x \\ge 12 \\Rightarrow x \\ge 4$.'
             },
             {
-                id: 'q4_4', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
+                id: 'q4_4',
+                chapter: 4,
+                topic: 'الدوال والجذور والأسس النسبية',
                 question: 'إنطاق المقام للمقدار $\\frac{6}{\\sqrt{3}}$ يعطي:',
                 options: ['2\\sqrt{3}', '3\\sqrt{2}', '6\\sqrt{3}', '2'],
-                correct: 0, explanation: 'نضرب البسط والمقام في $\\sqrt{3}$: $\\frac{6\\sqrt{3}}{3} = 2\\sqrt{3}$.'
-            },
-            {
-                id: 'q4_5', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
-                question: 'مدى دالة الجذر التربيعي $f(x) = \\sqrt{x} + 3$ هو:',
-                options: ['[3, \\infty)', '[0, \\infty)', '(3, \\infty)', '\\mathbb{R}'],
-                correct: 0, explanation: 'بما أن $\\sqrt{x} \\ge 0$ فإن $\\sqrt{x} + 3 \\ge 3$، وبالتالي المدى هو $[3, \\infty)$.'
-            },
-            {
-                id: 'q4_6', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
-                question: 'الصورة الجذرية للمقدار الأسسي $x^{\\frac{3}{4}}$ هي:',
-                options: ['\\sqrt[4]{x^3}', '\\sqrt[3]{x^4}', 'x^7', '\\frac{1}{\\sqrt[4]{x^3}}'],
-                correct: 0, explanation: 'الأس النسبي $x^{\\frac{m}{n}} = \\sqrt[n]{x^2}$ حيث المقام (4) هو دليل الجذر والبسط (3) هو أُس المتغير.'
-            },
-            {
-                id: 'q4_7', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
-                question: 'تبسيط العبارة الجذرية $\\sqrt{50x^4}$ هو:',
-                options: ['5x^2\\sqrt{2}', '2x^2\\sqrt{5}', '25x^2', '5x\\sqrt{2}'],
-                correct: 0, explanation: '$\\sqrt{50x^4} = \\sqrt{25 \\cdot 2 \\cdot x^4} = 5x^2\\sqrt{2}$.'
-            },
-            {
-                id: 'q4_8', chapter: 4, topic: 'المعادلات والمتباينات الجذرية',
-                question: 'حل المعادلة الجذرية $\\sqrt{x + 2} = 4$ هو:',
-                options: ['14', '16', '2', '18'],
-                correct: 0, explanation: 'بتربيع الطرفين: $x + 2 = 16 \\Rightarrow x = 14$.'
-            },
-            {
-                id: 'q4_9', chapter: 4, topic: 'تركيب الدوال والدوال العكسية',
-                question: 'تكون الدالتان $f$ و $g$ عكسيتين لبعضهما إذا وفقط إذا كان التركيب $[f \\circ g](x)$ يساوي:',
-                options: ['x (الدالة المحايدة)', '1', '0', 'f(x) \\cdot g(x)'],
-                correct: 0, explanation: 'شرط الدوال العكسية هو أن يكون التركيب كلاهما مساوياً للدالة المحايدة $x$.'
-            },
-            {
-                id: 'q4_10', chapter: 4, topic: 'تركيب الدوال والدوال العكسية',
-                question: 'اختبار الخط الأفقي يُستخدم لتحديد ما إذا كانت:',
-                options: ['الدالة لها دالة عكسية (متباينة)', 'الدالة زوجية', 'الدالة فردية', 'المصفوفة لها نظير ضربي'],
-                correct: 0, explanation: 'إذا تقاطع أي خط أفقي مع التمثيل البياني في نقطة واحدة كحد أقصى، فالدالة لها دالة عكسية.'
-            },
-            {
-                id: 'q4_11', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
-                question: 'تبسيط العبارة $\\sqrt[3]{27x^6}$ يساوي:',
-                options: ['3x^2', '9x^2', '3x^3', '27x^2'],
-                correct: 0, explanation: '$\\sqrt[3]{27} = 3$ و $\\sqrt[3]{x^6} = x^{\\frac{6}{3}} = x^2$. إذن الناتج $3x^2$.'
-            },
-            {
-                id: 'q4_12', chapter: 4, topic: 'المعادلات والمتباينات الجذرية',
-                question: 'الحل الدخيل في المعادلة الجذرية هو:',
-                options: ['حل يتولد أثناء الخطوات لكنه لا يحقق المعادلة الأصلية', 'الحل الصحيح الوحيد', 'العدد التخيلي i', 'المحدد الصفري'],
-                correct: 0, explanation: 'الحل الدخيل هو نتيجة تظهر بسبب بتربيع الطرفين لكن عند التعويض به لا يحقق المعادلة الأصلية.'
-            },
-            {
-                id: 'q4_13', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
-                question: 'ناتج ضرب $x^{\\frac{1}{2}} \\cdot x^{\\frac{1}{3}}$ يساوي:',
-                options: ['x^{\\frac{5}{6}}', 'x^{\\frac{1}{6}}', 'x^{\\frac{2}{5}}', 'x^1'],
-                correct: 0, explanation: 'نجمع الأسس: $\\frac{1}{2} + \\frac{1}{3} = \\frac{3+2}{6} = \\frac{5}{6}$.'
-            },
-            {
-                id: 'q4_14', chapter: 4, topic: 'المعادلات والمتباينات الجذرية',
-                question: 'حل المتباينة الجذرية $\\sqrt{x - 3} > 2$ هو:',
-                options: ['x > 7', 'x > 5', 'x \\ge 3', 'x < 7'],
-                correct: 0, explanation: 'بتربيع الطرفين: $x - 3 > 4 \\Rightarrow x > 7$.'
-            },
-            {
-                id: 'q4_15', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
-                question: 'نقطة بداية دالة الجذر التربيعي $f(x) = \\sqrt{x - 5} + 2$ هي:',
-                options: ['(5, 2)', '(-5, 2)', '(5, -2)', '(2, 5)'],
-                correct: 0, explanation: 'نقطة البداية لدالة الجذر التربيعي بالصورة $f(x) = a\\sqrt{x-h} + k$ هي $(h, k) = (5, 2)$.'
-            },
-            {
-                id: 'q4_16', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
-                question: 'ناتج تبسيط $3\\sqrt{2} + 5\\sqrt{2}$ هو:',
-                options: ['8\\sqrt{2}', '15\\sqrt{2}', '8\\sqrt{4}', '15\\sqrt{4}'],
-                correct: 0, explanation: 'الجذور متشابهة، نجمع المعاملات فقط: $(3 + 5)\\sqrt{2} = 8\\sqrt{2}$.'
-            },
-            {
-                id: 'q4_17', chapter: 4, topic: 'تركيب الدوال والدوال العكسية',
-                question: 'إذا كان $f(x) = x^3 + 1$ فإن الدالة العكسية $f^{-1}(x)$ هي:',
-                options: ['f^{-1}(x) = \\sqrt[3]{x - 1}', 'f^{-1}(x) = (x - 1)^3', 'f^{-1}(x) = \\sqrt[3]{x} - 1', 'f^{-1}(x) = \\frac{1}{x^3 + 1}'],
-                correct: 0, explanation: '$x = y^3 + 1 \\Rightarrow y^3 = x - 1 \\Rightarrow y = \\sqrt[3]{x - 1}$.'
-            },
-            {
-                id: 'q4_18', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
-                question: 'المجال للدالة $f(x) = \\frac{1}{\\sqrt{x - 2}}$ هو:',
-                options: ['(2, \\infty)', '[2, \\infty)', '\\mathbb{R} \\setminus \\{2\\}', '(-\\infty, 2)'],
-                correct: 0, explanation: 'لأن الجذر في المقام، يجب أن يكون ما تحت الجذر أكبر تماماً من الصفر: $x - 2 > 0 \\Rightarrow x > 2$.'
-            },
-            {
-                id: 'q4_19', chapter: 4, topic: 'الدوال والجذور والأسس النسبية',
-                question: 'تبسيط المقدار $(x^8)^{\\frac{1}{4}}$ بفرض القيم المتاحة موجبة هو:',
-                options: ['x^2', 'x^4', 'x^{32}', 'x^6'],
-                correct: 0, explanation: 'ضرب الأسس: $8 \\times \\frac{1}{4} = 2 \\Rightarrow x^2$.'
-            },
-            {
-                id: 'q4_20', chapter: 4, topic: 'المعادلات والمتباينات الجذرية',
-                question: 'المعامل الرئيس لدالة الجذر التربيعي $f(x) = -3\\sqrt{x + 1} + 4$ يؤدي لـ:',
-                options: ['انعكاس التمثيل البياني لأسفل وتمدد رأسي بمقدار 3', 'انسحاب لليمين فقط', 'تضيق أفقي بمقدار 4', 'فتح منحنى الدالة للأعلى'],
-                correct: 0, explanation: 'الإشارة السالمة تؤدي لانعكاس حول المحور $x$ والقيمة 3 تسبب تمدداً رأسياً.'
+                correct: 0,
+                explanation: 'نضرب البسط والمقام في $\\sqrt{3}$: $\\frac{6\\sqrt{3}}{\\sqrt{3} \\cdot \\sqrt{3}} = \\frac{6\\sqrt{3}}{3} = 2\\sqrt{3}$.'
             }
         ];
 
@@ -1160,141 +791,132 @@
 
         // Initialize App on DOM Load
         window.addEventListener('DOMContentLoaded', () => {
-            loadChapterMasteryProgress();
             loadCustomQuestionsFromStorage();
             loadStudentScoresFromStorage();
             updateTotalCounters();
-            renderChapterButtons();
-            renderProgressionCards();
             filterChapter(1);
             document.getElementById('print-date').innerText = new Date().toLocaleDateString('ar-SA');
         });
 
-        // Chapter Unlock Check: Chapter 1 is always unlocked. Chapters 2..4 require mastering previous chapter.
-        function isChapterUnlocked(chapNum) {
-            if (chapNum === 1) return true;
-            return chapterMastery[chapNum - 1] === true;
-        }
-
-        function loadChapterMasteryProgress() {
-            try {
-                const stored = localStorage.getItem('tahsili_chapter_mastery');
-                if (stored) {
-                    chapterMastery = JSON.parse(stored);
+        // LaTeX re-render helper function
+        function renderMath() {
+            setTimeout(() => {
+                if (window.renderMathInElement) {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ],
+                        throwOnError: false
+                    });
                 }
-            } catch(e) {
-                console.error("Could not load chapter mastery progress", e);
-            }
+            }, 50);
         }
 
-        function saveChapterMasteryProgress() {
-            localStorage.setItem('tahsili_chapter_mastery', JSON.stringify(chapterMastery));
-            renderChapterButtons();
-            renderProgressionCards();
-        }
-
-        function resetChapterProgress() {
-            if (confirm("هل أنت تأكد من إعادة ضبط تقدم المسار التعليمي وقفل الفصول المتقدمة؟")) {
-                chapterMastery = { 1: false, 2: false, 3: false, 4: false };
-                saveChapterMasteryProgress();
-                filterChapter(1);
-            }
-        }
-
-        function renderProgressionCards() {
-            const container = document.getElementById('chapter-progression-cards');
-            const chaptersInfo = [
-                { id: 1, name: 'الفصل 1: الدوال والمتباينات' },
-                { id: 2, name: 'الفصل 2: المصفوفات' },
-                { id: 3, name: 'الفصل 3: كثيرات الحدود' },
-                { id: 4, name: 'الفصل 4: الدوال الجذرية' }
-            ];
-
-            container.innerHTML = chaptersInfo.map(ch => {
-                const isMastered = chapterMastery[ch.id];
-                const isUnlocked = isChapterUnlocked(ch.id);
-
-                let badgeColor = "bg-slate-800 text-slate-400 border-slate-700";
-                let statusText = "🔒 مقفل";
-
-                if (isMastered) {
-                    badgeColor = "bg-emerald-950 text-emerald-300 border-emerald-700/60";
-                    statusText = "🏆 متقَن";
-                } else if (isUnlocked) {
-                    badgeColor = "bg-indigo-900/60 text-indigo-200 border-indigo-700/60";
-                    statusText = "🔓 قيد التعلم";
-                }
-
-                return `
-                    <div class="p-2.5 rounded-xl border ${badgeColor} text-center space-y-1">
-                        <span class="block text-[10px] font-bold text-slate-300 truncate">${ch.name}</span>
-                        <span class="inline-block text-[11px] font-black">${statusText}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderChapterButtons() {
-            const container = document.getElementById('chapter-buttons-grid');
-            const chapTitles = [
-                { num: 1, name: 'الدوال والمتباينات' },
-                { num: 2, name: 'المصفوفات' },
-                { num: 3, name: 'كثيرات الحدود ودوالها' },
-                { num: 4, name: 'العلاقات والدوال العكسية والجذرية' }
-            ];
-
-            container.innerHTML = chapTitles.map(ch => {
-                const unlocked = isChapterUnlocked(ch.num);
-                const mastered = chapterMastery[ch.num];
-                const isActive = currentFilteredChapter === ch.num;
-
-                let btnClass = "p-3 rounded-xl border text-right transition-all flex justify-between items-center cursor-pointer ";
-
-                if (isActive) {
-                    btnClass += "bg-indigo-600 border-indigo-700 text-white shadow-md font-bold";
-                } else if (!unlocked) {
-                    btnClass += "bg-slate-100 border-slate-200 text-slate-400 opacity-75 hover:bg-slate-200";
-                } else if (mastered) {
-                    btnClass += "bg-emerald-50 border-emerald-300 text-emerald-900 hover:bg-emerald-100";
-                } else {
-                    btnClass += "bg-white border-slate-200 text-slate-700 hover:bg-slate-50";
-                }
-
-                return `
-                    <button onclick="filterChapter(${ch.num})" id="chap-btn-${ch.num}" class="${btnClass}">
-                        <div>
-                            <span class="text-[10px] font-bold block ${isActive ? 'text-indigo-200' : 'text-slate-400'}">الفصل ${ch.num}</span>
-                            <span class="font-bold text-xs sm:text-sm block">${ch.name}</span>
-                        </div>
-                        <div class="text-base">
-                            ${mastered ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : (!unlocked ? '<i class="fa-solid fa-lock text-slate-400"></i>' : '<i class="fa-solid fa-unlock text-indigo-500"></i>')}
-                        </div>
-                    </button>
-                `;
-            }).join('');
-        }
-
-        function filterChapter(chapNumber) {
-            // Mastery Check before switching
-            if (!isChapterUnlocked(chapNumber)) {
-                alert(`🔒 هذا الفصل مقفل حالياً!\n\nلإلغاء قفل الفصل ${chapNumber} والتقدم إليه، ينبغي أولاً إتقان الفصل السابق (الفصل ${chapNumber - 1}) وتحقيق نسبة 80% أو أعلى في اختبار إتقانه.`);
+        // Tab Switching Logic with Lock Interception
+        function switchTab(tabName) {
+            if ((tabName === 'upload' && !unlockedTabs.upload) || (tabName === 'grades' && !unlockedTabs.grades)) {
+                targetLockedTab = tabName;
+                openLockModal(tabName);
                 return;
             }
 
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                btn.classList.add('text-slate-300');
+            });
+
+            const activeContent = document.getElementById(`tab-${tabName}`);
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+
+            if (activeContent && activeBtn) {
+                activeContent.classList.remove('hidden');
+                activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+                activeBtn.classList.remove('text-slate-300');
+            }
+
+            if (tabName === 'grades') {
+                renderGradesTable();
+            }
+
+            renderMath();
+        }
+
+        // Security Lock Modal Functions
+        function openLockModal(tabKey) {
+            const titleEl = document.getElementById('lock-modal-title');
+            const descEl = document.getElementById('lock-modal-desc');
+
+            if (tabKey === 'grades') {
+                titleEl.innerText = "سجل الدرجات محمي برمز مرور";
+                descEl.innerText = "يرجى إدخال الرمز السري (3212) لعرض كشف درجات الطلاب ونتائج الاختبارات";
+            } else {
+                titleEl.innerText = "مركز الرفع محمي برمز مرور";
+                descEl.innerText = "يرجى إدخال الرمز السري (3212) لدخول مركز رفع وتفريغ الأسئلة";
+            }
+
+            document.getElementById('unlock-pin-input').value = '';
+            document.getElementById('lock-error-msg').classList.add('hidden');
+            document.getElementById('lock-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('unlock-pin-input').focus(), 100);
+        }
+
+        function closeLockModal() {
+            document.getElementById('lock-modal').classList.add('hidden');
+            targetLockedTab = null;
+        }
+
+        function checkUnlockPin() {
+            const inputVal = document.getElementById('unlock-pin-input').value.trim();
+            if (inputVal === PROTECTED_PIN_CODE) {
+                if (targetLockedTab) {
+                    unlockedTabs[targetLockedTab] = true;
+                    
+                    // Update navigation button icons
+                    if (targetLockedTab === 'grades') {
+                        const icon = document.getElementById('grades-tab-icon');
+                        const btnSpan = document.querySelector('#tab-btn-grades span');
+                        if (icon) icon.className = "fa-solid fa-graduation-cap text-emerald-400";
+                        if (btnSpan) btnSpan.innerText = "سجل الدرجات";
+                    } else if (targetLockedTab === 'upload') {
+                        const icon = document.getElementById('upload-tab-icon');
+                        const btnSpan = document.querySelector('#tab-btn-upload span');
+                        if (icon) icon.className = "fa-solid fa-lock-open text-emerald-400";
+                        if (btnSpan) btnSpan.innerText = "مركز رفع الأسئلة";
+                    }
+
+                    const destination = targetLockedTab;
+                    closeLockModal();
+                    switchTab(destination);
+                }
+            } else {
+                document.getElementById('lock-error-msg').classList.remove('hidden');
+                document.getElementById('unlock-pin-input').value = '';
+                document.getElementById('unlock-pin-input').focus();
+            }
+        }
+
+        function filterChapter(chapNumber) {
             currentFilteredChapter = chapNumber;
             selectedTopicFilter = 'ALL';
 
-            renderChapterButtons();
-
-            // Update current chapter title display in quiz card
-            const chapNames = ['', 'الدوال والمتباينات', 'المصفوفات', 'كثيرات الحدود ودوالها', 'العلاقات والدوال العكسية والجذرية'];
-            document.getElementById('current-chap-title-display').innerText = `اختبار إتقان الفصل ${chapNumber}: (${chapNames[chapNumber]})`;
+            // Update chapter filter button styles
+            document.querySelectorAll('.chap-filter-btn').forEach((btn, index) => {
+                if (index + 1 === chapNumber) {
+                    btn.className = "chap-filter-btn active p-3 rounded-xl border text-right transition-all bg-indigo-50 border-indigo-500 text-indigo-900 shadow-sm";
+                } else {
+                    btn.className = "chap-filter-btn p-3 rounded-xl border border-slate-200 text-right transition-all hover:bg-slate-50 text-slate-700";
+                }
+            });
 
             // Build topic sub-filter pills
             const topics = [...new Set(questionBank.filter(q => q.chapter === chapNumber).map(q => q.topic))];
             const topicContainer = document.getElementById('topic-pills-container');
             
-            let pillsHTML = `<button onclick="setTopicFilter('ALL')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedTopicFilter === 'ALL' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">جميع الأسئلة (${getChapterQuestionCount(chapNumber)})</button>`;
+            let pillsHTML = `<button onclick="setTopicFilter('ALL')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedTopicFilter === 'ALL' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">الكل (${getChapterQuestionCount(chapNumber)})</button>`;
             
             topics.forEach(t => {
                 pillsHTML += `<button onclick="setTopicFilter('${t}')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedTopicFilter === t ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">${t}</button>`;
@@ -1304,28 +926,109 @@
             renderChapterQuestions();
         }
 
-        function startCurrentChapterQuiz() {
-            const chapQuestions = questionBank.filter(q => q.chapter === currentFilteredChapter);
-            if (chapQuestions.length === 0) {
-                alert("لا توجد أسئلة كافية لبدء اختبار هذا الفصل حالياً.");
+        function setTopicFilter(topicName) {
+            selectedTopicFilter = topicName;
+            filterChapter(currentFilteredChapter);
+        }
+
+        function getChapterQuestionCount(chapNum) {
+            return questionBank.filter(q => q.chapter === chapNum).length;
+        }
+
+        function renderChapterQuestions() {
+            const container = document.getElementById('chapter-questions-list');
+            let questions = questionBank.filter(q => q.chapter === currentFilteredChapter);
+
+            if (selectedTopicFilter !== 'ALL') {
+                questions = questions.filter(q => q.topic === selectedTopicFilter);
+            }
+
+            if (questions.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-8 text-center text-slate-400 border border-slate-200">
+                        <i class="fa-solid fa-folder-open text-3xl mb-2"></i>
+                        <p class="text-sm font-bold">لا توجد أسئلة متوفرة في هذا التصنيف حالياً.</p>
+                    </div>
+                `;
                 return;
             }
 
-            // Prompt student for name if not set
-            let nameInput = activeStudentInfo.name;
-            let idInput = activeStudentInfo.id;
+            container.innerHTML = questions.map((q, idx) => `
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-start gap-3">
+                        <span class="inline-block bg-indigo-50 text-indigo-700 text-xs font-extrabold px-3 py-1 rounded-lg">
+                            سؤال ${idx + 1} • ${q.topic}
+                        </span>
+                        ${q.isCustom ? '<span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded">مُضاف حديثاً</span>' : ''}
+                    </div>
+
+                    <p class="font-bold text-slate-900 text-base sm:text-lg leading-relaxed">${q.question}</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        ${q.options.map((opt, oIdx) => `
+                            <button onclick="checkChapterAnswer('${q.id}', ${oIdx}, ${q.correct})" id="chap-opt-${q.id}-${oIdx}" 
+                                    class="p-3 rounded-xl border border-slate-200 text-right text-sm font-semibold text-slate-700 hover:border-indigo-400 hover:bg-slate-50 transition-all flex items-center justify-between">
+                                <span>${opt}</span>
+                                <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-400 font-mono">${String.fromCharCode(65 + oIdx)}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Explanation Card (Hidden by default) -->
+                    <div id="expl-${q.id}" class="hidden p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1 mt-3">
+                        <span class="font-bold text-indigo-900 block flex items-center gap-1">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i> الشرح والتوضيح:
+                        </span>
+                        <p class="text-slate-700 leading-normal">${q.explanation}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            renderMath();
+        }
+
+        function checkChapterAnswer(qId, selectedIdx, correctIdx) {
+            const explBox = document.getElementById(`expl-${qId}`);
+            if (explBox) explBox.classList.remove('hidden');
+
+            for (let i = 0; i < 4; i++) {
+                const btn = document.getElementById(`chap-opt-${qId}-${i}`);
+                if (!btn) continue;
+                btn.disabled = true;
+
+                if (i === correctIdx) {
+                    btn.className = "p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 text-sm font-bold flex items-center justify-between";
+                } else if (i === selectedIdx && selectedIdx !== correctIdx) {
+                    btn.className = "p-3 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 text-sm font-bold flex items-center justify-between";
+                } else {
+                    btn.className = "p-3 rounded-xl border border-slate-200 opacity-50 text-right text-sm text-slate-500 flex items-center justify-between";
+                }
+            }
+
+            renderMath();
+        }
+
+        function startExam() {
+            const nameInput = document.getElementById('student-name-input').value.trim();
+            const idInput = document.getElementById('student-id-input').value.trim();
 
             if (!nameInput || !idInput) {
-                nameInput = prompt("يرجى إدخال اسم الطالب للبدء باختبار إتقان الفصل:", "طالب التحصيلي") || "طالب التحصيلي";
-                idInput = prompt("يرجى إدخال رقم الطالب / الهوية:", "10001") || "10001";
+                alert("⚠️ يرجى إدخال اسم الطالب ورقم الطالب/الهوية أولاً لبدء الاختبار وحفظ النتيجة في سجل الدرجات.");
+                return;
             }
 
             activeStudentInfo = { name: nameInput, id: idInput };
             document.getElementById('header-student-name').innerText = activeStudentInfo.name;
-            document.getElementById('active-student-display').innerText = `اختبار إتقان الفصل ${currentFilteredChapter} | الطالب: ${activeStudentInfo.name}`;
+            document.getElementById('active-student-display').innerText = `الطالب: ${activeStudentInfo.name} (${activeStudentInfo.id})`;
 
-            // Prepare questions specifically for current chapter
-            examQuestionsList = [...chapQuestions].map(q => {
+            const requestedCount = parseInt(document.getElementById('exam-q-count').value);
+            
+            // Shuffle and pick random questions from entire bank
+            const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+            examQuestionsList = shuffled.slice(0, Math.min(requestedCount, shuffled.length));
+
+            // Deep clone and shuffle options for each question
+            examQuestionsList = examQuestionsList.map(q => {
                 const optionsWithOrigIndex = q.options.map((opt, i) => ({ opt, isCorrect: i === q.correct }));
                 optionsWithOrigIndex.sort(() => 0.5 - Math.random());
 
@@ -1337,9 +1040,8 @@
             });
 
             examUserAnswers = {};
-            examTimeRemaining = examQuestionsList.length * 60; // 1 min per question
+            examTimeRemaining = examQuestionsList.length * 60; // 1 minute per question
 
-            switchTab('exam');
             document.getElementById('exam-start-card').classList.add('hidden');
             document.getElementById('exam-result-card').classList.add('hidden');
             document.getElementById('exam-active-card').classList.remove('hidden');
@@ -1349,7 +1051,81 @@
             startExamTimer();
         }
 
-        // Custom submit exam with Chapter Mastery evaluation
+        function startExamTimer() {
+            clearInterval(examTimerInterval);
+            updateTimerDisplay();
+
+            examTimerInterval = setInterval(() => {
+                examTimeRemaining--;
+                updateTimerDisplay();
+
+                if (examTimeRemaining <= 300 && examTimeRemaining > 0) {
+                    document.getElementById('timer-warning-note').classList.remove('hidden');
+                    document.getElementById('timer-badge').classList.replace('bg-amber-500', 'bg-rose-600');
+                    document.getElementById('timer-badge').classList.add('text-white');
+                }
+
+                if (examTimeRemaining <= 0) {
+                    clearInterval(examTimerInterval);
+                    alert("⚠ انتهى الوقت المحدد للاختبار! سيتم تسليم إجاباتك وحفظ الدرجة آلياً.");
+                    submitExam(true);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(examTimeRemaining / 60);
+            const seconds = examTimeRemaining % 60;
+            document.getElementById('exam-timer-text').innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function renderExamQuestions() {
+            const container = document.getElementById('exam-questions-container');
+
+            container.innerHTML = examQuestionsList.map((q, idx) => `
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-slate-500">سؤال ${idx + 1} من ${examQuestionsList.length}</span>
+                        <span class="bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-md">الفصل ${q.chapter}</span>
+                    </div>
+
+                    <p class="font-bold text-slate-900 text-base sm:text-lg leading-relaxed">${q.question}</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        ${q.shuffledOptions.map((opt, oIdx) => `
+                            <button onclick="selectExamAnswer(${idx}, ${oIdx})" id="exam-opt-${idx}-${oIdx}" 
+                                    class="exam-opt-btn-${idx} p-3 rounded-xl border border-slate-200 text-right text-sm font-semibold text-slate-700 hover:border-indigo-400 transition-all flex items-center justify-between">
+                                <span>${opt}</span>
+                                <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-400 font-mono">${String.fromCharCode(65 + oIdx)}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            renderMath();
+        }
+
+        function selectExamAnswer(questionIdx, optionIdx) {
+            examUserAnswers[questionIdx] = optionIdx;
+
+            // Highlight selected button
+            document.querySelectorAll(`.exam-opt-btn-${questionIdx}`).forEach((btn, idx) => {
+                if (idx === optionIdx) {
+                    btn.className = `exam-opt-btn-${questionIdx} p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-900 text-sm font-bold flex items-center justify-between shadow-sm`;
+                } else {
+                    btn.className = `exam-opt-btn-${questionIdx} p-3 rounded-xl border border-slate-200 text-right text-sm font-semibold text-slate-700 opacity-60 flex items-center justify-between`;
+                }
+            });
+
+            // Update Progress bar
+            const answeredCount = Object.keys(examUserAnswers).length;
+            const percentage = (answeredCount / examQuestionsList.length) * 100;
+            document.getElementById('exam-progress-bar').style.width = `${percentage}%`;
+            document.getElementById('current-q-index').innerText = answeredCount || 1;
+        }
+
         function submitExam(isAutoSubmit = false) {
             clearInterval(examTimerInterval);
 
@@ -1365,13 +1141,6 @@
             // Record score in Student Scores Ledger
             saveScoreRecord(activeStudentInfo.name, activeStudentInfo.id, examQuestionsList.length, correctCount, scorePercent);
 
-            // Check if this was a chapter quiz and evaluate mastery
-            const currentChapInExam = examQuestionsList[0]?.chapter;
-            if (currentChapInExam && scorePercent >= 80) {
-                chapterMastery[currentChapInExam] = true;
-                saveChapterMasteryProgress();
-            }
-
             // Display Results View
             document.getElementById('exam-active-card').classList.add('hidden');
             document.getElementById('exam-result-card').classList.remove('hidden');
@@ -1379,16 +1148,6 @@
             document.getElementById('result-student-info').innerText = `الطالب: ${activeStudentInfo.name} | رقم الطالب: ${activeStudentInfo.id}`;
             document.getElementById('result-score-percent').innerText = `${scorePercent}%`;
             document.getElementById('result-correct-ratio').innerText = `${correctCount}/${examQuestionsList.length}`;
-
-            // Show Mastery celebration if passed >= 80%
-            if (currentChapInExam && scorePercent >= 80) {
-                const nextChapNum = currentChapInExam + 1;
-                let unlockMsg = nextChapNum <= 4 ? `🎉 أبدعت! تم فتح الفصل ${nextChapNum} لك بنجاح!` : `🏆 تهانينا! لقد أتقنت جميع الفصول في منهج رياضيات تحصيلي ثاني ثانوي!`;
-                
-                alert(`🏆 مبارك! حققت نسبة ${scorePercent}% وتم اعتماد إتقانك للفصل ${currentChapInExam}.\n${unlockMsg}`);
-            } else if (currentChapInExam) {
-                alert(`⚠️ حققت نسبة ${scorePercent}%. لإلغاء قفل الفصل التالي يلزمك تحقيق نسبة 80% فأكثر. يمكنك إعادة الاختبار لمراجعة وتقوية النقاط الخاطئة.`);
-            }
 
             // Render Answers Review
             const reviewContainer = document.getElementById('exam-answers-review');
