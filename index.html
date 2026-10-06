@@ -1153,8 +1153,57 @@
             const scorePercent = Math.round((correctCount / examQuestionsList.length) * 100);
 
             // Record score in Student Scores Ledger
-            saveScoreRecord(activeStudentInfo.name, activeStudentInfo.id, examQuestionsList.length, correctCount, scorePercent);
+            async function saveScoreRecord(name, studentId, total, correct, percent) {
+let gradeText = 'ضعيف';
 
+if (percent >= 90) gradeText = 'ممتاز';
+else if (percent >= 80) gradeText = 'جيد جداً';
+else if (percent >= 70) gradeText = 'جيد';
+else if (percent >= 60) gradeText = 'مقبول';
+
+const record = {
+    id: 'score_' + Date.now(),
+    name: name,
+    studentId: studentId,
+    date: new Date().toLocaleString('ar-SA'),
+    total: total,
+    correct: correct,
+    percent: percent,
+    grade: gradeText
+};
+
+console.log("Sending to Supabase:", record);
+
+const result = await supabaseClient
+    .from('student_results')
+    .insert([record]);
+
+console.log("Supabase response:", result);
+
+if (result.error) {
+    alert(
+        "❌ خطأ Supabase\n\n" +
+        "Code: " + result.error.code + "\n\n" +
+        "Message: " + result.error.message + "\n\n" +
+        "Details: " + result.error.details + "\n\n" +
+        "Hint: " + result.error.hint
+    );
+
+    return false;
+}
+
+alert("✅ تم حفظ النتيجة في قاعدة البيانات بنجاح!");
+
+studentScoresList.unshift(record);
+updateTotalCounters();
+
+localStorage.setItem(
+    'tahsili_student_scores',
+    JSON.stringify(studentScoresList)
+);
+
+return true;
+}
             // Display Results View
             document.getElementById('exam-active-card').classList.add('hidden');
             document.getElementById('exam-result-card').classList.remove('hidden');
