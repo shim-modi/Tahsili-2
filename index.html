@@ -98,8 +98,229 @@
             background: #94a3b8;
         }
     </style>
+
+<style>
+.teacher-panel{padding:25px}.teacher-lock{max-width:420px;margin:40px auto;padding:30px;text-align:center;background:#fff;border-radius:18px;box-shadow:0 8px 30px #0001}.teacher-lock input{padding:12px;width:100%;margin:15px 0;border:1px solid #ddd;border-radius:10px;text-align:center}.teacher-btn{padding:10px 18px;border:0;border-radius:10px;cursor:pointer;font-weight:bold}.teacher-primary{background:#2563eb;color:#fff}.teacher-stats{display:flex;gap:15px;flex-wrap:wrap;margin:20px 0}.teacher-stat{background:#fff;padding:18px;border-radius:14px;min-width:160px;text-align:center;box-shadow:0 5px 20px #0001}.teacher-stat b{display:block;font-size:25px;margin-top:5px}.teacher-table-wrap{overflow:auto;background:#fff;border-radius:15px}.teacher-table{width:100%;min-width:800px;border-collapse:collapse}.teacher-table th,.teacher-table td{padding:12px;border-bottom:1px solid #eee;text-align:center}.teacher-table th{background:#f8fafc}.teacher-error{color:#b91c1c;display:none}
+</style>
+
+<script>
+/* ===== Supabase Auth + Teacher Dashboard ===== */
+const SUPABASE_URL = "https://wdwpibwzrffeierquknu.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_bI5wPwfYqNGxWbOiwJlMuQ_j9NrNZme";
+const RESULTS_TABLE = "student_results";
+let teacherAccessToken = sessionStorage.getItem("teacherAccessToken") || "";
+let teacherUser = null;
+
+async function supabaseAuth(path, options = {}) {
+  const headers = {
+    "apikey": SUPABASE_PUBLISHABLE_KEY,
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/${path}`, {
+    ...options,
+    headers
+  });
+  const text = await response.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; } catch { data = { message: text }; }
+  if (!response.ok) throw new Error(data.error_description || data.msg || data.message || "تعذر تنفيذ طلب تسجيل الدخول");
+  return data;
+}
+
+async function teacherSignIn() {
+  const email = document.getElementById("teacherEmail").value.trim();
+  const password = document.getElementById("teacherPassword").value;
+  const error = document.getElementById("teacherAuthError");
+  error.style.display = "none";
+
+  if (!email || !password) {
+    error.textContent = "أدخل البريد الإلكتروني وكلمة المرور.";
+    error.style.display = "block";
+    return;
+  }
+
+  try {
+    const data = await supabaseAuth("token?grant_type=password", {
+      method: "POST",
+      body: JSON.stringify({ email, password })
+    });
+
+    teacherAccessToken = data.access_token || "";
+    teacherUser = data.user || null;
+    if (!teacherAccessToken) throw new Error("لم يتم الحصول على جلسة دخول.");
+
+    sessionStorage.setItem("teacherAccessToken", teacherAccessToken);
+    if (data.refresh_token) sessionStorage.setItem("teacherRefreshToken", data.refresh_token);
+
+    showTeacherDashboard();
+    await refreshTeacherResults();
+  } catch (e) {
+    error.textContent = "فشل تسجيل الدخول: " + e.message;
+    error.style.display = "block";
+  }
+}
+
+async function teacherSignOut() {
+  try {
+    if (teacherAccessToken) {
+      await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_PUBLISHABLE_KEY,
+          "Authorization": `Bearer ${teacherAccessToken}`
+        }
+      });
+    }
+  } catch (_) {}
+  teacherAccessToken = "";
+  teacherUser = null;
+  sessionStorage.removeItem("teacherAccessToken");
+  sessionStorage.removeItem("teacherRefreshToken");
+  showTeacherLogin();
+}
+
+function teacherHeaders() {
+  return {
+    "apikey": SUPABASE_PUBLISHABLE_KEY,
+    "Authorization": `Bearer ${teacherAccessToken}`
+  };
+}
+
+async function loadTeacherResults() {
+  if (!teacherAccessToken) throw new Error("يجب تسجيل الدخول أولًا.");
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/${RESULTS_TABLE}?select=*&order=date.desc`,
+    { headers: teacherHeaders() }
+  );
+  const text = await response.text();
+  if (!response.ok) {
+    let msg = text;
+    try {
+      const j = JSON.parse(text);
+      msg = j.message || j.hint || j.details || msg;
+    } catch (_) {}
+    throw new Error(msg || "تعذر جلب النتائج.");
+  }
+  return text ? JSON.parse(text) : [];
+}
+
+async function saveStudentResult(name, studentId, total, correct) {
+  const percent = total ? Number((correct / total * 100).toFixed(2)) : 0;
+  const grade = percent >= 90 ? "ممتاز" :
+                percent >= 85 ? "متقن" :
+                percent >= 75 ? "جيد جدًا" :
+                percent >= 60 ? "جيد" : "يحتاج دعم";
+
+  const data = {
+    id: Date.now().toString() + "_" + Math.random().toString(36).slice(2, 8),
+    name,
+    studentId,
+    date: new Date().toISOString(),
+    total: Number(total),
+    correct: Number(correct),
+    percent,
+    grade
+  };
+
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${RESULTS_TABLE}`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_PUBLISHABLE_KEY,
+      "Content-Type": "application/json",
+      "Prefer": "return=minimal"
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || "تعذر حفظ النتيجة.");
+  }
+  return data;
+}
+
+async function refreshTeacherResults() {
+  const status = document.getElementById("teacherStatus");
+  try {
+    status.textContent = "جاري تحميل النتائج...";
+    const rows = await loadTeacherResults();
+
+    document.getElementById("teacherCount").textContent = rows.length;
+    const avg = rows.length
+      ? rows.reduce((sum, r) => sum + Number(r.percent || 0), 0) / rows.length
+      : 0;
+    document.getElementById("teacherAvg").textContent = avg.toFixed(1) + "%";
+
+    document.getElementById("teacherBody").innerHTML =
+      rows.map((r, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${teacherEsc(r.name)}</td>
+          <td>${teacherEsc(r.studentId)}</td>
+          <td>${teacherEsc(formatTeacherDate(r.date))}</td>
+          <td>${r.total}</td>
+          <td>${r.correct}</td>
+          <td><strong>${Number(r.percent || 0).toFixed(1)}%</strong></td>
+          <td>${teacherEsc(r.grade)}</td>
+        </tr>
+      `).join("") ||
+      "<tr><td colspan='8'>لا توجد نتائج.</td></tr>";
+
+    status.textContent = `تم تحميل ${rows.length} نتيجة`;
+  } catch (e) {
+    status.textContent = "خطأ: " + e.message;
+    document.getElementById("teacherBody").innerHTML =
+      "<tr><td colspan='8'>تعذر تحميل النتائج. تأكد من تسجيل الدخول وإعداد RLS.</td></tr>";
+  }
+}
+
+function formatTeacherDate(value) {
+  try { return new Date(value).toLocaleString("ar-SA"); }
+  catch (_) { return value || ""; }
+}
+
+function teacherEsc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+  }[m]));
+}
+
+function showTeacherLogin() {
+  document.getElementById("teacherLock").style.display = "block";
+  document.getElementById("teacherPanel").style.display = "none";
+}
+
+function showTeacherDashboard() {
+  document.getElementById("teacherLock").style.display = "none";
+  document.getElementById("teacherPanel").style.display = "block";
+}
+
+async function openTeacherTab() {
+  document.querySelectorAll(".tab-content").forEach(x => x.style.display = "none");
+  const tab = document.getElementById("teacherTab");
+  if (tab) tab.style.display = "block";
+
+  if (teacherAccessToken) {
+    showTeacherDashboard();
+    await refreshTeacherResults();
+  } else {
+    showTeacherLogin();
+  }
+}
+
+function initTeacherAuth() {
+  if (teacherAccessToken) {
+    showTeacherDashboard();
+  } else {
+    showTeacherLogin();
+  }
+}
+</script>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col selection:bg-violet-500 selection:text-white">
+
+
 
     <!-- Top Header / Navigation -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
@@ -224,6 +445,30 @@
                     <p class="text-slate-600 text-sm sm:text-base max-w-lg mx-auto">
                         اختبار متكامل يقوم بسحب أسئلة عشوائية متنوعة من كافة فصول المادة الثمانية، من بنك الأسئلة القابلة للتصحيح آليًا. تم تخصيص **دقيقة واحدة بالضبط لكل سؤال**.
                     </p>
+                </div>
+
+                <!-- Student Information -->
+                <div class="bg-violet-50 p-5 rounded-2xl border border-violet-200 max-w-xl mx-auto text-right">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-user-graduate text-violet-600"></i>
+                        <h3 class="font-black text-slate-800">بيانات الطالب</h3>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">أدخل البيانات قبل بدء الاختبار، وستُربط النتيجة بها تلقائيًا.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label for="student-name" class="block text-xs font-bold text-slate-600 mb-1.5">اسم الطالب</label>
+                            <input id="student-name" type="text" autocomplete="name"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-violet-300"
+                                placeholder="اكتب اسم الطالب">
+                        </div>
+                        <div>
+                            <label for="student-id" class="block text-xs font-bold text-slate-600 mb-1.5">رقم الطالب</label>
+                            <input id="student-id" type="text" inputmode="numeric" autocomplete="off"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-violet-300"
+                                placeholder="اكتب رقم الطالب">
+                        </div>
+                    </div>
+                    <p id="student-info-error" class="hidden mt-3 text-xs font-bold text-rose-600"></p>
                 </div>
 
                 <!-- Exam Config Settings -->
@@ -430,7 +675,10 @@
             </div>
         </section>
 
-    </main>
+    
+
+
+</main>
 
     <!-- Custom Modal Popup for alerts -->
     <div id="custom-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
@@ -508,10 +756,10 @@
                     },
                     {
                         id: "src_c1_q1",
-                        q: "أي مجموعة من مجموعات الأعداد التالية لا ينتمي إليها العدد $25$؟",
+                        q: "أي مجموعة من مجموعات الأعداد التالية لا ينتمي إليها العدد $-25$؟",
                         options: ["الأعداد الكلية ($W$)", "الأعداد الصحيحة ($\\mathbb{Z}$)", "الأعداد النسبية ($Q$)", "الأعداد الحقيقية ($\\mathbb{R}$)"],
-                        correct: null,
-                        explain: "لا يوجد خيار صحيح في المصدر؛ العدد 25 ينتمي إلى الأعداد الكلية والصحيحة والنسبية والحقيقية جميعاً.",
+                        correct: 0,
+                        explain: "العدد −25 عدد صحيح ونسبي وحقيقي، لكنه ليس من الأعداد الكلية؛ لذا الإجابة هي الأعداد الكلية ($W$).",
                         sourceQuestion: 1
                     },
                     {
@@ -654,8 +902,8 @@
                         id: "src_c1_q19",
                         q: "أي أنظمة المتباينات الآتية ممثل في الشكل (مستقيم متقطع $y = -1$ ومستقيم متصل $y = -x + 1$):",
                         options: ["$y > -1 , y \\ge x + 1$", "$y \\ge -1 , y \\ge -x + 1$", "$y > -1 , y \\le -x + 1$", "$y > -1 , y < -x + 1$"],
-                        correct: null,
-                        explain: "لا يمكن تحديد الخيار من النص وحده لأن السؤال يحيل إلى شكل وتظليل غير مرفقين؛ مصدر السؤال لا يحدد منطقة الحل.",
+                        correct: 2,
+                        explain: "الخط المتقطع يعني متباينة صارمة $y>-1$، والخط المتصل مع المنطقة المظللة أسفله يعني $y\\le -x+1$؛ لذا الإجابة C.",
                         sourceQuestion: 19
                     }
                 ]
@@ -669,15 +917,15 @@
                         id: "c2_q1",
                         q: "ما رتبة المصفوفة $\\begin{bmatrix} 1 & 2 & 5 & 0 \\\\ 5 & 9 & 7 & 0 \\\\ 3 & -4 & 8 & 0 \\end{bmatrix}$؟",
                         options: ["$3 \\times 4$", "$4 \\times 3$", "$3 \\times 2$", "$3 \\times 3$"],
-                        correct: 0,
-                        explain: "تتكون المصفوفة من 3 صفوف و 4 أعمدة، لذا رتبتها هي $3 \\times 4$."
+                        correct: 1,
+                        explain: "تتكون المصفوفة من 3 صفوف و 4 أعمدة، لذا رتبتها هي $4 \\times 3$."
                     },
                     {
                         id: "c2_q2",
                         q: "في المصفوفة $\\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & 5 & 4 \\\\ 7 & 8 & 9 \\end{bmatrix}$، قيمة العنصر $a_{23}$ هي:",
                         options: ["0", "2", "4", "8"],
-                        correct: 2,
-                        explain: "$a_{23}$ يعني العنصر الواقع في الصف الثاني والعمود الثالث وهو العدد 4."
+                        correct: 0,
+                        explain: "$a_{23}$ يعني العنصر الواقع في الصف الثاني والعمود الثالث وهو العدد 0."
                     },
                     {
                         id: "c2_q3",
@@ -718,8 +966,8 @@
                         id: "src_c2_q20",
                         q: "ما رتبة المصفوفة $\\begin{bmatrix} 1 & 2 & 5 & 0 \\\\ 5 & 9 & 7 & 0 \\\\ 3 & -4 & 8 & 0 \\end{bmatrix}$؟",
                         options: ["$3 \\times 4$", "$4 \\times 3$", "$3 \\times 2$", "$3 \\times 3$"],
-                        correct: 0,
-                        explain: "المصفوفة فيها 3 صفوف و4 أعمدة، إذن رتبتها 3×4.",
+                        correct: 1,
+                        explain: "المصفوفة فيها 3 صفوف و4 أعمدة، إذن رتبتها 4×3.",
                         sourceQuestion: 20
                     },
                     {
@@ -734,8 +982,8 @@
                         id: "src_c2_q22",
                         q: "في المصفوفة $\\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & 5 & 4 \\\\ 7 & 8 & 9 \\end{bmatrix}$، قيمة العنصر $a_{23}$ هي:",
                         options: ["$0$", "$2$", "$4$", "$8$"],
-                        correct: 2,
-                        explain: "العنصر a23 يقع في الصف الثاني والعمود الثالث، وقيمته 4.",
+                        correct: 0,
+                        explain: "العنصر a23 يقع في الصف الثاني والعمود الثالث، وقيمته 0.",
                         sourceQuestion: 22
                     },
                     {
@@ -918,7 +1166,7 @@
                         id: "src_c3_q38",
                         q: "المقدار $(2+3i)(1-2i)$ يساوي:",
                         options: ["$8-7i$", "$6-2i$", "$-4-i$", "$8-i$"],
-                        correct: 0,
+                        correct: 3,
                         explain: "بالتوزيع: (2+3i)(1−2i)=8−i.",
                         sourceQuestion: 38
                     },
@@ -1470,8 +1718,8 @@
                         id: "src_c4_q72",
                         q: "ما الدالة العكسية للدالة $f(x) = \\frac{1-x}{2}$؟",
                         options: ["$-2x + 1$", "$2x - 1$", "$-2x - 1$", "$2x + 1$"],
-                        correct: 2,
-                        explain: "y=(1−x)/2 ⇒ 2y=1−x ⇒ x=1−2y، إذن f⁻¹(x)=1−2x.",
+                        correct: 0,
+                        explain: "y=(1−x)/2 ⇒ 2y=1−x ⇒ x=1−2y، إذن f⁻¹(x)=1−2x، وهو الخيار A.",
                         sourceQuestion: 72
                     },
                     {
@@ -1663,6 +1911,8 @@
         let examFlags = {};   // qIdx -> boolean
         let examTimerInterval = null;
         let examTimeRemaining = 0; // seconds
+        let examStudentName = "";
+        let examStudentId = "";
 
         /* ==========================================================================
            INITIALIZATION & EVENT LISTENERS
@@ -1889,28 +2139,46 @@
            TAB 2: TIMED EXAM ENGINE LOGIC
            ========================================================================== */
         function startExam() {
+            const nameInput = document.getElementById('student-name');
+            const idInput = document.getElementById('student-id');
+            const errorEl = document.getElementById('student-info-error');
+
+            const name = nameInput ? nameInput.value.trim() : "";
+            const studentId = idInput ? idInput.value.trim() : "";
+
+            if (!name || !studentId) {
+                if (errorEl) {
+                    errorEl.textContent = "يجب إدخال اسم الطالب ورقم الطالب قبل بدء الاختبار.";
+                    errorEl.classList.remove('hidden');
+                }
+                if (!name && nameInput) nameInput.focus();
+                else if (!studentId && idInput) idInput.focus();
+                return;
+            }
+
+            if (errorEl) errorEl.classList.add('hidden');
+
+            examStudentName = name;
+            examStudentId = studentId;
+
             const count = parseInt(document.getElementById('exam-q-count').value);
-            
-            // Gather all questions from all 8 chapters
+
             let allQ = [];
-            ALL_CHAPTERS.forEach(c => {
-                c.questions.forEach(q => {
-                    if (q.correct !== null) {
-                        allQ.push({ ...q, chapterTitle: c.title });
+            ALL_CHAPTERS.forEach(ch => {
+                ch.questions.forEach(q => {
+                    if (q.correct !== null && q.correct !== undefined) {
+                        allQ.push({ ...q, chapter: ch.title });
                     }
                 });
             });
 
-            // Shuffle questions randomly
             allQ.sort(() => Math.random() - 0.5);
-            examQuestions = allQ.slice(0, count);
+            examQuestions = allQ.slice(0, Math.min(count, allQ.length));
 
             examActiveIdx = 0;
             examAnswers = {};
             examFlags = {};
-
-            // Set timer (1 min per question)
-            examTimeRemaining = count * 60;
+            examTimeRemaining = examQuestions.length * 60;
 
             document.getElementById('exam-intro-card').classList.add('hidden');
             document.getElementById('exam-result-screen').classList.add('hidden');
@@ -2075,6 +2343,23 @@
             const total = examQuestions.length;
             const percent = Math.round((score / total) * 100);
 
+            saveStudentResult(examStudentName, examStudentId, total, score)
+                .then(() => {
+                    const saveNotice = document.getElementById('exam-save-notice');
+                    if (saveNotice) {
+                        saveNotice.textContent = "تم حفظ نتيجة الطالب بنجاح.";
+                        saveNotice.className = "mt-3 text-sm font-bold text-emerald-600";
+                    }
+                })
+                .catch((error) => {
+                    const saveNotice = document.getElementById('exam-save-notice');
+                    if (saveNotice) {
+                        saveNotice.textContent = "تعذر حفظ النتيجة في قاعدة البيانات. تأكد من إعداد صلاحية INSERT في Supabase.";
+                        saveNotice.className = "mt-3 text-sm font-bold text-rose-600";
+                    }
+                    console.error("Student result save error:", error);
+                });
+
             document.getElementById('exam-active-screen').classList.add('hidden');
             const resScreen = document.getElementById('exam-result-screen');
             resScreen.classList.remove('hidden');
@@ -2089,7 +2374,8 @@
                 
                 <div>
                     <h2 class="text-3xl font-black text-slate-800">نتيجة الاختبار الشامل</h2>
-                    <p class="text-slate-500 text-sm mt-1">تمت المعالجة وحساب مستوى الإتقان</p>
+                    <p class="text-slate-500 text-sm mt-1">الطالب: ${escapeHtml(examStudentName)} — رقم الطالب: ${escapeHtml(examStudentId)}</p>
+                    <p id="exam-save-notice" class="mt-3 text-sm font-bold text-slate-500">جارٍ حفظ النتيجة...</p>
                 </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-xl mx-auto text-right">
@@ -2273,6 +2559,16 @@
             }
         }
 
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[char]));
+        }
+
         function showCustomModal(title, body, onConfirm = null) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-body').innerText = body;
@@ -2297,5 +2593,6 @@
             document.getElementById('custom-modal').classList.add('hidden');
         }
     </script>
+<script>/* لوحة المعلمة محفوظة في الكود للاستخدام من واجهة منفصلة لاحقًا. */</script>
 </body>
 </html>
