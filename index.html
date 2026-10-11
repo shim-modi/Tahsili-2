@@ -459,13 +459,13 @@ function initTeacherAuth() {
                             <label for="student-name" class="block text-xs font-bold text-slate-600 mb-1.5">اسم الطالب</label>
                             <input id="student-name" type="text" autocomplete="name"
                                 class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-violet-300"
-                                placeholder="اكتب اسم الطالب">
+                                placeholder=" اكتب اسم الطالب">
                         </div>
                         <div>
                             <label for="student-id" class="block text-xs font-bold text-slate-600 mb-1.5">رقم الطالب</label>
                             <input id="student-id" type="text" inputmode="numeric" autocomplete="off"
                                 class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-violet-300"
-                                placeholder="اكتب رقم الطالب">
+                                placeholder="اكتب رقم الطالب 4 ارقام">
                         </div>
                     </div>
                     <p id="student-info-error" class="hidden mt-3 text-xs font-bold text-rose-600"></p>
@@ -2145,6 +2145,9 @@ function initTeacherAuth() {
 
             const name = nameInput ? nameInput.value.trim() : "";
             const studentId = idInput ? idInput.value.trim() : "";
+            if(!/^\d{4}$/.test(studentId))
+            {alert("4ارقام فقط");
+        return;}
 
             if (!name || !studentId) {
                 if (errorEl) {
