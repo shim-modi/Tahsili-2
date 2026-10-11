@@ -180,9 +180,9 @@ async function loadResults() {
   status.textContent = "جارٍ تحميل النتائج...";
   status.className = "text-sm mb-3 text-slate-500";
   try {
-    const r = await fetch(`https://wdwpibwzrffeierquknu.supabase.co/rest/v1/sb_publishable_bI5wPwfYqNGxWbOiwJlMuQ_j9NrNZme?select=id,name,studentId,date,total,correct,percent,grade&order=date.desc`, {
+    const r = await fetch(`$https://wdwpibwzrffeierquknu.supabase.co/rest/v1/}/rest/v1/${RESULTS_TABLE}?select=id,name,studentId,date,total,correct,percent,grade&order=date.desc`, {
       headers: {
-        "apikey":sb_publishable_bI5wPwfYqNGxWbOiwJlMuQ_j9NrNZme,
+        "apikey": sb_publishable_bI5wPwfYqNGxWbOiwJlMuQ_j9NrNZme,
         "Authorization": `Bearer ${accessToken}`
       }
     });
